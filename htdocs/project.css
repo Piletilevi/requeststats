@@ -1,0 +1,12 @@
+.navbar {
+	margin-bottom: 20px;
+}
+
+.form-inline .form-group > .form-control,
+.form-inline .form-group > .btn {
+	min-width: 6em;
+}
+
+.form-inline label {
+    margin-left: 0.5em;
+}

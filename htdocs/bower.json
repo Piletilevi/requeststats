@@ -1,0 +1,11 @@
+{
+  "name": "piletilevi-requests",
+  "homepage": "",
+  "description": "",
+  "dependencies": {
+    "bootstrap": "3.3.*",
+    "bootstrap-select": "1.11.*",
+    "chart.js": "^2.7.2",
+    "bootstrap-daterangepicker": "2.1.27"
+  }
+}
