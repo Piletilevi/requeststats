@@ -71,7 +71,8 @@ $container['db'] = function ($c) {
         'username'  => $settings['user'],
         'password'  => $settings['pass'],
         'charset'   => 'utf8',
-        'timezone'   => '+03:00',
+        //           'timezone'   => '+03:00',
+        'timezone'   => date('P'),
         'collation' => 'utf8_unicode_ci',
     ]);
     $capsule->setFetchMode(PDO::FETCH_ASSOC);
