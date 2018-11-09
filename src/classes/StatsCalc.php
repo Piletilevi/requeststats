@@ -112,3 +112,20 @@ class StatsCalc
         return $query->pluck('aggregate', 'criteria');
     }
 }
+
+/*
+
+SELECT COUNT(*) AS `Строки`, `request_id` FROM `stat` GROUP BY `request_id` ORDER BY `request_id`
+---------------
+set @nr:= 0; set @co:= 0;set @su:= 0;
+SELECT @nr:= @nr+1 as NR,   COUNT(*)  AS `requests in showed time`, sum(duration) as 'total duration', AVG(duration) as 'average duration',  @su:= sum(status)  as 'succesfulled', (COUNT(*) - sum(status)) as 'failed', `time` FROM `stat` GROUP BY `time`
+ORDER BY NR  DESC
+----------
+SELECT sum(status) as 'succesfulled', count(*), count(*)- sum(status), time, GROUP_CONCAT(id)FROM `stat`  GROUP by time
+ORDER BY `stat`.`status` ASC
+
+SELECT @nr:= @nr+1 as NR,   COUNT(*)  AS `requests in showed time`, sum(duration) as 'total duration', AVG(duration) as 'average duration',  @su:= sum(status)  as 'succesfulled', (COUNT(*) - sum(status)) as 'failed', `time` FROM `stat` GROUP BY `time`
+ORDER BY NR  DESC
+--------------------------
+*/
+
