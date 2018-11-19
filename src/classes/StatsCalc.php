@@ -91,6 +91,34 @@ class StatsCalc
         return $result;
     }
 
+/*    public function queryDurationAvgsFirst10($criteria,$statExpression)
+    {
+#SELECT MAX(duration) from stat as MD;
+        select @md:= (SELECT avg(duration) from stat);
+SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
+        $query1 = $this->db->table('stat')
+            ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
+            ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
+            ->where('time', '<=', date('Y-m-d H:00:00', $this->endStamp))
+            ->groupBy('criteria');
+        $query = $this->db->table('stat')
+            ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
+            ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
+            ->where('time', '<=', date('Y-m-d H:00:00', $this->endStamp))
+            ->groupBy('criteria');
+        if ($this->status >= 0) {
+            $query->whereRaw("status = $this->status");
+        }
+        if ($this->requestId > 0) {
+            $query->where('request_id', $this->requestId);
+        }
+        $result = $this->queryAggregate($criteria, 'AVG(duration)');
+        foreach ($result as $key => $value) {
+            $result[$key] = round($value, 2);
+        }
+        return $result;
+    }*/
+
     protected function queryAggregate($criteria, $statExpression)
     {
         if (!in_array($criteria, array_flip(static::$groupingFormulas))) {
@@ -111,6 +139,33 @@ class StatsCalc
 
         return $query->pluck('aggregate', 'criteria');
     }
+/*    protected function maxDurAggregate($criteria, $statExpression)
+    {
+        if (!in_array($criteria, array_flip(static::$groupingFormulas))) {
+            throw new \InvalidArgumentException();
+        }
+        $groupExpression = static::$groupingFormulas[$criteria];
+        $query = $this->db->table('stat')
+
+
+            SET @md:= 0;
+#SELECT MAX(duration) from stat as MD;
+select @md:= (SELECT avg(duration) from stat);
+SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
+
+            ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
+            ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
+            ->where('time', '<=', date('Y-m-d H:00:00', $this->endStamp))
+            ->groupBy('criteria');
+        if ($this->status >= 0) {
+            $query->whereRaw("status = $this->status");
+        }
+        if ($this->requestId > 0) {
+            $query->where('request_id', $this->requestId);
+        }
+
+        return $query->pluck('aggregate', 'criteria');
+    }*/
 }
 
 /*
@@ -119,13 +174,25 @@ SELECT COUNT(*) AS `Строки`, `request_id` FROM `stat` GROUP BY `request_id
 ---------------
 set @nr:= 0; set @co:= 0;set @su:= 0;
 SELECT @nr:= @nr+1 as NR,   COUNT(*)  AS `requests in showed time`, sum(duration) as 'total duration', AVG(duration) as 'average duration',  @su:= sum(status)  as 'succesfulled', (COUNT(*) - sum(status)) as 'failed', `time` FROM `stat` GROUP BY `time`
-ORDER BY NR  DESC
+ORDER BY NR  DESC;
 ----------
 SELECT sum(status) as 'succesfulled', count(*), count(*)- sum(status), time, GROUP_CONCAT(id)FROM `stat`  GROUP by time
-ORDER BY `stat`.`status` ASC
+ORDER BY `stat`.`status` ASC;
 
 SELECT @nr:= @nr+1 as NR,   COUNT(*)  AS `requests in showed time`, sum(duration) as 'total duration', AVG(duration) as 'average duration',  @su:= sum(status)  as 'succesfulled', (COUNT(*) - sum(status)) as 'failed', `time` FROM `stat` GROUP BY `time`
-ORDER BY NR  DESC
+ORDER BY NR  DESC;
 --------------------------
+SET @md:= 0;
+#SELECT MAX(duration) from stat as MD;
+select @md:= (SELECT avg(duration) from stat);
+SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
+------------------
+set @nr:=0;
+SELECT @nr:= @nr+1 as NR,  COUNT(*)  AS `requests in showed time`, sum(duration) as 'total duration in showed time', AVG(duration) as 'average duration',  @su:= sum(status)  as 'succesfulled', (COUNT(*) - sum(status)) as 'failed', `time` FROM `stat` GROUP BY `time`
+ORDER BY `id` ASC;
+--------------
+set @nr:=0;
+SELECT @nr:= @nr+1 as NR,  COUNT(*)  AS `requests in showed time`, sum(duration) as 'total duration in showed time', AVG(duration) as 'average duration',  @su:= sum(status)  as 'succesfulled', (COUNT(*) - sum(status)) as 'failed', `time` FROM `stat` GROUP BY `time`
+ORDER BY `failed` desc;
 */
 
