@@ -21,6 +21,14 @@ class StatsCalc
         self::CRITERIA_HOURS_AGGREGATED => 'HOUR(`time`)',
         self::CRITERIA_DAYS_AGGREGATED  => 'WEEKDAY(`time`)',
     ];
+    protected static $groupingFormulasTotal = [
+        self::CRITERIA_HOURS            => 'DATE_FORMAT(`statDateTime`, "%Y-%m-%d %H")',
+        self::CRITERIA_DAYS             => 'DATE(`statDateTime`)',
+        // CRITERIA_WEEKS generates date of monday
+        self::CRITERIA_WEEKS            => 'DATE(DATE_ADD(`statDateTime`, INTERVAL(-WEEKDAY(`statDateTime`)) DAY))',
+        self::CRITERIA_HOURS_AGGREGATED => 'HOUR(`statDateTime`)',
+        self::CRITERIA_DAYS_AGGREGATED  => 'WEEKDAY(`statDateTime`)',
+    ];
     /*** @var Connection */
     protected $db;
     protected $startStamp = 0;
@@ -91,33 +99,33 @@ class StatsCalc
         return $result;
     }
 
-/*    public function queryDurationAvgsFirst10($criteria,$statExpression)
-    {
-#SELECT MAX(duration) from stat as MD;
-        select @md:= (SELECT avg(duration) from stat);
-SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
-        $query1 = $this->db->table('stat')
-            ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
-            ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
-            ->where('time', '<=', date('Y-m-d H:00:00', $this->endStamp))
-            ->groupBy('criteria');
-        $query = $this->db->table('stat')
-            ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
-            ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
-            ->where('time', '<=', date('Y-m-d H:00:00', $this->endStamp))
-            ->groupBy('criteria');
-        if ($this->status >= 0) {
-            $query->whereRaw("status = $this->status");
-        }
-        if ($this->requestId > 0) {
-            $query->where('request_id', $this->requestId);
-        }
-        $result = $this->queryAggregate($criteria, 'AVG(duration)');
-        foreach ($result as $key => $value) {
-            $result[$key] = round($value, 2);
-        }
-        return $result;
-    }*/
+    /*    public function queryDurationAvgsFirst10($criteria,$statExpression)
+        {
+    #SELECT MAX(duration) from stat as MD;
+            select @md:= (SELECT avg(duration) from stat);
+    SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
+            $query1 = $this->db->table('stat')
+                ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
+                ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
+                ->where('time', '<=', date('Y-m-d H:00:00', $this->endStamp))
+                ->groupBy('criteria');
+            $query = $this->db->table('stat')
+                ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
+                ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
+                ->where('time', '<=', date('Y-m-d H:00:00', $this->endStamp))
+                ->groupBy('criteria');
+            if ($this->status >= 0) {
+                $query->whereRaw("status = $this->status");
+            }
+            if ($this->requestId > 0) {
+                $query->where('request_id', $this->requestId);
+            }
+            $result = $this->queryAggregate($criteria, 'AVG(duration)');
+            foreach ($result as $key => $value) {
+                $result[$key] = round($value, 2);
+            }
+            return $result;
+        }*/
 
     protected function queryAggregate($criteria, $statExpression)
     {
@@ -139,19 +147,21 @@ SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
 
         return $query->pluck('aggregate', 'criteria');
     }
-/*    protected function maxDurAggregate($criteria, $statExpression)
-    {
-        if (!in_array($criteria, array_flip(static::$groupingFormulas))) {
-            throw new \InvalidArgumentException();
-        }
-        $groupExpression = static::$groupingFormulas[$criteria];
-        $query = $this->db->table('stat')
+
+    /*
+        protected function maxDurAggregate($criteria, $statExpression)
+        {
+            if (!in_array($criteria, array_flip(static::$groupingFormulas))) {
+                throw new \InvalidArgumentException();
+            }
+            $groupExpression = static::$groupingFormulas[$criteria];
+            $query =his->db->table('stat')
 
 
-            SET @md:= 0;
-#SELECT MAX(duration) from stat as MD;
-select @md:= (SELECT avg(duration) from stat);
-SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
+     SET @md:= 0;
+    #SELECT MAX(duration) from stat as MD;
+    select @md:= (SELECT avg(duration) from stat);
+    SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
 
             ->selectRaw("$groupExpression AS criteria , $statExpression AS aggregate")
             ->where('time', '>=', date('Y-m-d H:00:00', $this->startStamp))
@@ -165,12 +175,87 @@ SELECT duration from stat where duration>@md ORDER by duration DESC LIMIT 0,10;
         }
 
         return $query->pluck('aggregate', 'criteria');
-    }*/
+    }
+
+
+
+    */
+
+
+    protected function queryRequestNameByMaxDuration($criteria, $statExpression=false)
+    {
+/*        if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
+            throw new \InvalidArgumentException();
+        }*/
+    //    $groupExpression = static::$groupingFormulasTotal[$criteria];
+
+        $query = $this->db->table('total_stat')
+            ->selectRaw("requestName, duration, statDate, statTime")
+        //    ->where('statDateTime', '>=', date('Y-m-d H:00:00', $this->startStamp))
+        //    ->where('statDateTime', '<=', date('Y-m-d H:00:00', $this->endStamp))
+        //    ->groupBy('criteria')
+            ->orderBy('duration', 'DESC')
+         //   ->limit(10)
+        ;
+
+        $qr =  $query->pluck("requestName", "statTime");
+        //     $query->pluck("requestName", "duration");
+        return  $qr;
+    }
+    public function requestNameByMaxDuration($criteria)
+    {
+        $result = $this->queryRequestNameByMaxDuration($criteria);
+        foreach ($result as $key => $value) {
+        //    $result[$key]["requestname"] =  $value["requestname"];
+        //    $result[$key]["duration"] =  $value["duration"];
+            $result[$key]=  $value;
+        }
+        var_dump($result);
+        return $result;
+    }
+
 }
 
 /*
 
 SELECT COUNT(*) AS `Строки`, `request_id` FROM `stat` GROUP BY `request_id` ORDER BY `request_id`
+----------
+view
+SELECT
+    stat.id AS statId,
+    stat.time AS statDateTime,
+    DATE_FORMAT(stat.time, '%H:%i:%s') AS statTime,
+    DATE_FORMAT(stat.time, '%Y:%m:%d') AS statDate,
+    DAYOFWEEK(stat.time) AS statWeekDay,
+    stat.status AS statStatus,
+    stat.duration,
+    (
+    SELECT
+        request.name
+    FROM
+        request
+    WHERE
+        request.id = stat.request_id
+) AS requestName
+FROM
+    stat
+ORDER BY
+    `statId` ASC
+-----------
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_stat` AS select `stat`.`id` AS `statId`,`stat`.`time` AS `statDateTime`,date_format(`stat`.`time`,'%H:%i:%s') AS `statTime`,date_format(`stat`.`time`,'%Y:%m:%d') AS `statDate`,dayofweek(`stat`.`time`) AS `statWeekDay`,`stat`.`status` AS `statStatus`,`stat`.`duration` AS `duration`,(select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName` from `stat` order by `stat`.`id`
+
+***********
+1.
+SELECT requestname, duration FROM `total_stat` ORDER by duration desc limit 0,10
+-------------------------------------
+
+#SELECT MAX(duration) from stat as MD;
+#select @md:= (SELECT MAX(duration) from stat);
+set @nr:= 0;
+SELECT @nr:= @nr+1 as NR, id, time, duration, status, count from stat   ORDER by duration DESC LIMIT 0,10
+
+
+
 ---------------
 set @nr:= 0; set @co:= 0;set @su:= 0;
 SELECT @nr:= @nr+1 as NR,   COUNT(*)  AS `requests in showed time`, sum(duration) as 'total duration', AVG(duration) as 'average duration',  @su:= sum(status)  as 'succesfulled', (COUNT(*) - sum(status)) as 'failed', `time` FROM `stat` GROUP BY `time`

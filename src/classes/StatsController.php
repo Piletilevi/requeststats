@@ -103,6 +103,8 @@ class StatsController
         $calc->setEndStamp($endDate->getTimestamp());
         $calc->setRequestId($params['request']);
         $durations = $calc->queryDurationAvgs($calcCriteria);
+        $names = $calc->requestNameByMaxDuration($calcCriteria);
+
         $calc->setStatus(StatsManager::STATUS_SUCCESS);
         $successes = $calc->queryCounts($calcCriteria);
         $calc->setStatus(StatsManager::STATUS_FAIL);
@@ -114,6 +116,11 @@ class StatsController
         $countChart = new ChartComponent();
         $countChart->options->scales->xAxes[0]->scaleLabel->labelString = ucfirst($modeName);
         $countChart->options->scales->yAxes[0]->scaleLabel->labelString = 'Count';
+
+        $nameChart = new ChartComponent();
+        $nameChart->options->scales->xAxes[0]->scaleLabel->labelString = ucfirst($modeName);
+        $nameChart->options->scales->yAxes[0]->scaleLabel->labelString = 'ReqName';
+
         $segments = $labels = [];
         switch ($calcCriteria) {
             case  (StatsCalc::CRITERIA_HOURS):
@@ -166,6 +173,7 @@ class StatsController
         }
         $durationChart->data->labels = $labels;
         $countChart->data->labels = $durationChart->data->labels;
+        $nameChart->data->labels = $labels;
         $durationDataset = new ChartComponentDataSet();
         $durationDataset->label = 'Duration';
         $durationChart->data->datasets[] = $durationDataset;
@@ -173,6 +181,10 @@ class StatsController
         $countDataset = new ChartComponentDataSet();
         $countDataset->label = 'Successful requests';
         $countDataset->backgroundColor = $palette['success'];
+
+        $nameDataset = new ChartComponentDataSet();
+        $nameDataset->label = 'Successful requests';
+        $nameDataset->backgroundColor = $palette['success'];
 
         $countDataset2 = new ChartComponentDataSet();
         $countDataset2->label = 'Failed requests';
@@ -182,17 +194,20 @@ class StatsController
 
         foreach ($segments as $segment) {
             $duration = isset($durations[$segment]) ? $durations[$segment] : 0;
+            $name = isset($names[$segment]) ? $names[$segment] : 0;
             $successCount = isset($successes[$segment]) ? $successes[$segment] : 0;
             $failCount = isset($fails[$segment]) ? $fails[$segment] : 0;
             $durationDataset->data[] = $duration;
             $countDataset->data[] = $successCount;
             $countDataset2->data[] = $failCount;
+            $nameDataset->data[] = $name;
         }
         $requests = $statsManager->queryRequestNames();
 
         return $view->render($response, 'index.twig', [
             'durationChart' => $durationChart,
             'countChart'    => $countChart,
+            'nameChart'    => $nameChart,
             'requests'      => $requests,
             'params'        => $params,
             'modes'         => static::$modeNames,
