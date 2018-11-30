@@ -190,15 +190,15 @@ class StatsCalc
     //    $groupExpression = static::$groupingFormulasTotal[$criteria];
 
         $query = $this->db->table('total_stat')
-            ->selectRaw("requestName, duration, statDate, statTime")
+            ->selectRaw("statId,requestName, duration, statDate, statTime")
         //    ->where('statDateTime', '>=', date('Y-m-d H:00:00', $this->startStamp))
         //    ->where('statDateTime', '<=', date('Y-m-d H:00:00', $this->endStamp))
         //    ->groupBy('criteria')
-            ->orderBy('duration', 'DESC')
+            ->orderBy('statId', 'ASC')
          //   ->limit(10)
         ;
 
-        $qr =  $query->pluck("requestName", "statTime");
+        $qr =  $query->pluck("statTime", "statId");
         //     $query->pluck("requestName", "duration");
         return  $qr;
     }

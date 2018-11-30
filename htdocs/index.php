@@ -42,12 +42,13 @@ echo IntlDateFormatter::formatObject(
          'ru-RU');
 */
 $fmt = new IntlDateFormatter(
-    'et-EE',
+    '',
 
     IntlDateFormatter::FULL,
-    IntlDateFormatter::LONG,
-    'Europe/Tallinn',
-    IntlDateFormatter::GREGORIAN
+    IntlDateFormatter::LONG
+
+ //   'Europe/Tallinn',
+//    IntlDateFormatter::GREGORIAN
 //    "m"
 );
 //$kuupaev		=	$fmt->format(new DateTime('2018-04 00:00:01 Europe/Tallinn'));
