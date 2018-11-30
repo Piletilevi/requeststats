@@ -194,24 +194,36 @@ class StatsCalc
         //    ->where('statDateTime', '>=', date('Y-m-d H:00:00', $this->startStamp))
         //    ->where('statDateTime', '<=', date('Y-m-d H:00:00', $this->endStamp))
         //    ->groupBy('criteria')
-            ->orderBy('statId', 'ASC')
-         //   ->limit(10)
+            ->orderBy('duration', 'DESC')
+           ->limit(10)
         ;
 
-        $qr =  $query->pluck("statTime", "statId");
+     //   $qr =  $query->pluck("duration", "statId");
+/*        $qr2 =  $query->pluck("requestName", "statId");
+        $qr3 =  $query->pluck("duration", "statId");
+        $qr4 =  $query->pluck("statDate", "statId");
+        $qr5 =  $query->pluck("statTime", "statId");
         //     $query->pluck("requestName", "duration");
-        return  $qr;
+        return  array($qr2, $qr3, $qr4, $qr5);
+*/
+         $qr =  $query->get("requestName, duration, statDate, statTime");
+        return $qr;
     }
     public function requestNameByMaxDuration($criteria)
     {
         $result = $this->queryRequestNameByMaxDuration($criteria);
+        $resultEnd = [];
         foreach ($result as $key => $value) {
         //    $result[$key]["requestname"] =  $value["requestname"];
         //    $result[$key]["duration"] =  $value["duration"];
-            $result[$key]=  $value;
-        }
-        var_dump($result);
-        return $result;
+            $key = $value["statId"];
+            $resultEnd[$key]=  array($value['requestName'],$value['statDate'],$value['statTime'],$value['requestName']) ;
+        //    echo $key;
+         }
+         echo "<pre>";
+         print_r($resultEnd);
+        echo "</pre>";
+        return $resultEnd;
     }
 
 }
