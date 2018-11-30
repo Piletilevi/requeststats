@@ -184,17 +184,19 @@ class StatsCalc
 
     protected function queryRequestNameByMaxDuration($criteria, $statExpression=false)
     {
-/*        if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
+         if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
             throw new \InvalidArgumentException();
-        }*/
-    //    $groupExpression = static::$groupingFormulasTotal[$criteria];
+        }
+        $groupExpression = static::$groupingFormulasTotal[$criteria];
 
         $query = $this->db->table('total_stat')
-            ->selectRaw("statId,requestName, duration, statDate, statTime")
-        //    ->where('statDateTime', '>=', date('Y-m-d H:00:00', $this->startStamp))
-        //    ->where('statDateTime', '<=', date('Y-m-d H:00:00', $this->endStamp))
-        //    ->groupBy('criteria')
+            ->selectRaw("$groupExpression AS criteria , statId,requestName, duration, statDate, statTime, statWeekDay")
+             ->where('statDateTime', '>=', date('Y-m-d H:00:00', $this->startStamp))
+            ->where('statDateTime', '<=', date('Y-m-d H:00:00', $this->endStamp))
+             ->groupBy('criteria')
             ->orderBy('duration', 'DESC')
+            ->orderBy('statDate', 'DESC')
+            ->orderBy('statTime', 'DESC')
            ->limit(10)
         ;
 
@@ -206,7 +208,7 @@ class StatsCalc
         //     $query->pluck("requestName", "duration");
         return  array($qr2, $qr3, $qr4, $qr5);
 */
-         $qr =  $query->get("requestName, duration, statDate, statTime");
+         $qr =  $query->get("requestName, duration, statDate, statTime, statWeekDay");
         return $qr;
     }
     public function requestNameByMaxDuration($criteria)
@@ -217,7 +219,13 @@ class StatsCalc
         //    $result[$key]["requestname"] =  $value["requestname"];
         //    $result[$key]["duration"] =  $value["duration"];
             $key = $value["statId"];
-            $resultEnd[$key]=  array($value['requestName'],$value['statDate'],$value['statTime'],$value['requestName']) ;
+            $resultEnd[$key]=  array(
+                'Name'=> rtrim(ltrim($value['requestName'],'xml_'),'.p'),
+                'Date'=>$value['statDate'],
+                'Time'=>$value['statTime'],
+                'WeekDay'=>$value['statWeekDay'],
+                'duration'=>$value['duration']
+            ) ;
         //    echo $key;
          }
          echo "<pre>";
