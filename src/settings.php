@@ -9,6 +9,9 @@ set_error_handler(function ($severity, $message, $file, $line) {
     }
     throw new \ErrorException($message, 0, $severity, $file, $line);
 });
+date_default_timezone_set('Europe/Tallinn');
+setlocale(LC_ALL, 'et_EE.utf-8');
+setlocale(LC_NUMERIC, 'C');
 
 return [
     'settings' => [
