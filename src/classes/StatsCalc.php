@@ -197,7 +197,7 @@ class StatsCalc
             ->orderBy('duration', 'DESC')
             ->orderBy('statDate', 'DESC')
             ->orderBy('statTime', 'DESC')
-           ->limit(10)
+           ->limit(100)//
         ;
 
      //   $qr =  $query->pluck("duration", "statId");
@@ -209,6 +209,38 @@ class StatsCalc
         return  array($qr2, $qr3, $qr4, $qr5);
 */
          $qr =  $query->get("requestName, duration, statDate, statTime, statWeekDay");
+        return $qr;
+    }
+    protected function queryTotalDurationsByReqName($criteria, $statExpression=false)
+    {
+         if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
+            throw new \InvalidArgumentException();
+        }
+        $groupExpression = static::$groupingFormulasTotal[$criteria];
+
+        $query = $this->db->table('total_stat')
+            ->selectRaw("$groupExpression AS criteria, 
+SUM(duration) AS Durations,
+requestName,
+SUM(statStatus) AS successStatuses,
+COUNT(requestName) AS requestCount
+")
+             ->where('statDate', '>=', date('Y-m-d', $this->startStamp))
+            ->where('statDate', '<=', date('Y-m-d', $this->endStamp))
+             ->groupBy('requestName')
+            ->orderBy('duration', 'DESC')
+            //    ->limit(100)
+        ;
+
+     //   $qr =  $query->pluck("duration", "statId");
+/*        $qr2 =  $query->pluck("requestName", "statId");
+        $qr3 =  $query->pluck("duration", "statId");
+        $qr4 =  $query->pluck("statDate", "statId");
+        $qr5 =  $query->pluck("statTime", "statId");
+        //     $query->pluck("requestName", "duration");
+        return  array($qr2, $qr3, $qr4, $qr5);
+*/
+         $qr =  $query->get("Durations, requestName, successStatuses, requestCount");
         return $qr;
     }
     public function requestNameByMaxDuration($criteria)
@@ -228,9 +260,33 @@ class StatsCalc
             ) ;
         //    echo $key;
          }
-         echo "<pre>";
+/*
+      echo "<pre>";
          print_r($resultEnd);
         echo "</pre>";
+*/
+        return $resultEnd;
+    }
+    public function totalDurationsByReqName($criteria)
+    {
+        $result = $this->queryTotalDurationsByReqName($criteria);
+        $resultEnd = [];
+        foreach ($result as $key => $value) {
+        //    $result[$key]["requestname"] =  $value["requestname"];
+        //    $result[$key]["duration"] =  $value["duration"];
+            $key = rtrim(ltrim($value['requestName'],'xml_'),'.p');
+            $resultEnd[$key]=  array(
+                'Success'=>$value['successStatuses'],
+                'Requests'=>$value['requestCount'],
+                'Durations'=>$value['Durations']
+            ) ;
+        //    echo $key;
+         }
+/*
+      echo "<pre>";
+         print_r($resultEnd);
+        echo "</pre>";
+*/
         return $resultEnd;
     }
 
@@ -265,6 +321,46 @@ ORDER BY
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_stat` AS select `stat`.`id` AS `statId`,`stat`.`time` AS `statDateTime`,date_format(`stat`.`time`,'%H:%i:%s') AS `statTime`,date_format(`stat`.`time`,'%Y:%m:%d') AS `statDate`,dayofweek(`stat`.`time`) AS `statWeekDay`,`stat`.`status` AS `statStatus`,`stat`.`duration` AS `duration`,(select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName` from `stat` order by `stat`.`id`
 
 ***********
+ * --------------
+ alter  VIEW `total_stat`
+AS select
+`stat`.`id` AS `statId`,
+`stat`.`time` AS `statDateTime`,
+TIME(`stat`.`time`) AS `statTime`,
+DATE(`stat`.`time`) AS `statDate`,
+dayofweek(`stat`.`time`) AS `statWeekDay`,
+`stat`.`status` AS `statStatus`,
+`stat`.`duration` AS `duration`,
+(select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName`
+from `stat` order by `stat`.`id`
+-----------------------
+
+SELECT sum(duration) as Durations,requestName FROM `total_stat` where EXTRACT(YEAR_MONTH FROM statDate)='201809' and statStatus=1 GROUP by requestName ORDER BY Durations DESC
+-----------
+VIEW `total_durations_by_reqname`
+
+CREATE OR REPLACE VIEW `total_durations_by_reqname` AS
+SELECT
+    SUM(`total_stat`.`duration`) AS `Durations`,
+    `total_stat`.`requestName` AS `requestName`,
+    SUM(`total_stat`.`statStatus`) AS `successStatuses`,
+    COUNT(`total_stat`.`requestName`) AS `requestCount`
+FROM
+    `piletilevi_requests`.`total_stat`
+GROUP BY
+    `total_stat`.`requestName`
+ORDER BY
+    SUM(`total_stat`.`duration`)
+DESC
+
+ ***************
+SELECT
+    SUM(duration) AS Durations,  SUM(statStatus) AS successStatuses,    COUNT(requestName) AS requestCount, requestName
+FROM     `total_stat` WHERE EXTRACT(YEAR_MONTH FROM statDate) ='201811'
+GROUP BY    requestName
+ORDER BY    Durations DESC
+****************
+
 1.
 SELECT requestname, duration FROM `total_stat` ORDER by duration desc limit 0,10
 -------------------------------------

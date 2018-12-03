@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Piletilevi requests</title>
+    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="bower_components/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <link href="bower_components/bootstrap-daterangepicker/daterangepicker.css" rel="stylesheet">
+    <link href="bootstraptheme.css" rel="stylesheet">
+    <link href="project.css" rel="stylesheet">
+    <style>
+        .chart {
+            position: relative;
+            padding-top: 50%;
+        }
+
+        .chart canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-static-top">
+    <div class="container">
+        <div class="navbar-header">
+            {#<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">#}
+            {#<span class="sr-only">Toggle navigation</span>#}
+            {#<span class="icon-bar"></span>#}
+            {#<span class="icon-bar"></span>#}
+            {#<span class="icon-bar"></span>#}
+            {#</button>#}
+            <a class="navbar-brand" href="/">Piletilevi requests</a>
+        </div>
+        {#<div id="navbar" class="collapse navbar-collapse">#}
+        {#<ul class="nav navbar-nav">#}
+        {#<li class="active"><a href="#">Home</a></li>#}
+        {#<li><a href="#about">About</a></li>#}
+        {#<li><a href="#contact">Contact</a></li>#}
+        {#</ul>#}
+        {#</div>#}
+    </div>
+</nav>
+
+<div class="container">
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form class="form-inline" method="get">
+                <div class="form-group">
+                    <label for="form-control-date" class="control-label">Date</label>
+                    <input type="text" name="date" class="daterangeinput form-control" id="form-control-date" value="{{ params.date }}">
+                </div>
+                <div class="form-group">
+                    <label for="form-control-request" class="control-label">Request</label>
+                    <select name="request" class="selectpicker form-control col-undoselectpickerfullwidthstyle" id="form-control-request">
+                        <option value=""{% if not params.request %} selected="selected"{% endif %}>All</option>
+                        {% for item in requests %}
+                            <option value="{{ item.id }}"{% if params.request == item.id %} selected="selected"{% endif %}>{{ item.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="form-control-mode" class="control-label">Mode</label>
+                    <select name="mode" class="selectpicker form-control col-undoselectpickerfullwidthstyle" id="form-control-mode">
+                        {% for item in modes %}
+                            <option value="{{ item }}"{% if params.mode == item %} selected="selected"{% endif %}>{{ item | capitalize }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+{#
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="chart" data-params="{{ durationChart | json_encode }}"></div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="chart" data-params="{{ countChart | json_encode }}"></div>
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div id="" class="chart" data-params="{{ nameChart | json_encode }}"></div>
+        </div>
+    </div>
+    #}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <canvas id="popChartTotal" height="220" data-names="{{ totalChart | json_encode }}"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="bower_components/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+<script src="bower_components/chart.js/dist/Chart.min.js"></script>
+<script src="bower_components/moment/min/moment.min.js"></script>
+<script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+<script src="project.js"></script>
+<script>popChartTotal();</script>
+</body>
+</html>
