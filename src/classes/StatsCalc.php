@@ -318,7 +318,8 @@ FROM
 ORDER BY
     `statId` ASC
 -----------
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_stat` AS select `stat`.`id` AS `statId`,`stat`.`time` AS `statDateTime`,date_format(`stat`.`time`,'%H:%i:%s') AS `statTime`,date_format(`stat`.`time`,'%Y:%m:%d') AS `statDate`,dayofweek(`stat`.`time`) AS `statWeekDay`,`stat`.`status` AS `statStatus`,`stat`.`duration` AS `duration`,(select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName` from `stat` order by `stat`.`id`
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_stat` AS
+select `stat`.`id` AS `statId`,`stat`.`time` AS `statDateTime`,date_format(`stat`.`time`,'%H:%i:%s') AS `statTime`,date_format(`stat`.`time`,'%Y:%m:%d') AS `statDate`,dayofweek(`stat`.`time`) AS `statWeekDay`,`stat`.`status` AS `statStatus`,`stat`.`duration` AS `duration`,(select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName` from `stat` order by `stat`.`id`
 
 ***********
  * --------------
