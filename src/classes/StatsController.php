@@ -535,9 +535,10 @@ var_dump(array_merge_recursive($names,$namesSuccess));
         $requests = $statsManager->queryRequestNames();
 
 
-
+$total = array_merge_recursive($names,$namesSuccess);
         return $view->render($response, 'total.twig', [
-            'totalChart'    => array_merge_recursive($names,$namesSuccess),
+            'totalChart'    => $total,
+            'rowCount'      => count($total)*3*6,
             'requests'      => $requests,
             'params'        => $params,
             'modes'         => static::$modeNames,

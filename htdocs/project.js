@@ -197,7 +197,7 @@ var $backgroundColors=[
 	 var $opacityBG = [];
 	 $opacityBG['total'] = 60;
 	 $opacityBG['success'] = 90;
-	 $opacityBG['fail'] = 30;
+	 $opacityBG['fail'] = 24;
 
 	 Object.keys($opacityBG).map(function(key, i){
 		 console.log(key) ;
@@ -211,142 +211,133 @@ var $backgroundColors=[
 	 });
 
 
+     var barChart = new Chart(popCanvas, {
+         type: 'horizontalBar',
+         data: {
+             labels: $labels,
+             datasets: [{
+                 title: "total of Durations",
+                 data: $durations,
+                 tooltipItems: $tooltips,
+                 backgroundColor: $backgroundColorsRGBA['total'],
+                 borderWidth: [0, 0, 0, 0],
+                 //	borderWidth: 0.5,
+             }, {
+                 title: "total of Success Durations",
+                 data: $durationsSuccess,
+                 backgroundColor: $backgroundColorsRGBA['success'],
+                 borderWidth: [0, 0, 0, 0],
+             }, {
+                 title: "total of Failed Durations",
+                 data: $durationsFail,
+                 backgroundColor: $backgroundColorsRGBA['fail'],
+                 borderWidth: [0, 0, 0, 0],
+             },
+             ],
 
-	var barChart = new Chart(popCanvas, {
-		type: 'horizontalBar',
-		data: {
-			labels: $labels,
-			datasets: [{
-title:"total of Durations",
-                data: $durations,
-                tooltipItems: $tooltips,
-                backgroundColor: $backgroundColorsRGBA['total'],
-				borderWidth: [0, 0, 0, 0],
-			//	borderWidth: 0.5,
-            },{
-					title:"total of Success Durations",
-					data: $durationsSuccess,
-			//		tooltipItems: $tooltips,
-			 	 	backgroundColor:  $backgroundColorsRGBA['success'],
-				borderWidth: [0, 0, 0, 0],
-				},{
-					title:"total of Failed Durations",
-					data: $durationsFail,
-			//		tooltipItems: $tooltips,
-					backgroundColor: $backgroundColorsRGBA['fail'],
-				borderWidth: [0, 0, 0, 0],
-				},
-			],
-
-        },
-        options: {
-         //   maintainAspectRatio: false,
-			tooltips: {
-				callbacks: {
-					label: function (t, d) {
- 						if (t.datasetIndex === 0) {
-							return $tooltips[t.index]['total'];
-						} else if (t.datasetIndex === 1) {
-							return $tooltips[t.index]['success'];
-						} else if (t.datasetIndex === 2) {
-							return $tooltips[t.index]['fail'];
-						}
-
-					}
-				},
-                cornerRadius: 10,
-                caretSize: 10,
-                xPadding: 10,
-                yPadding: 12,
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                titleFontStyle: 'normal',
-                titleMarginBottom: 15
-            },
-            legend: {
-                display: true,
-                position: 'top',//
-                labels: {
-                    //    boxWidth: 20,
-                    fontColor: 'rgb(60, 180, 100)',
-                    padding: 0,
-                //     boxHeight:80,
-                },
-            },
-            scales: {
-                yAxes: [{
-					categoryPercentage: .96,
-                    barPercentage:.96,
-						barThickness:'flex',
-					//   barThickness: 20,
-                    gridLines: {
-                        color: "#f7f7f7",
-                        display: true,
-						lineWidth:.5,
-					//	zeroLineColor: "#5e7287",
-						zeroLineWidth: 0,
-                    //    borderDash: [2, 5],
-                    },
-                    beginAtZero: true,
-                    ticks: {
-                        autoSkip: false,
-                        padding: leftSpace,
-                    },
-					scaleLabel: {
-						display: true,
-						labelString: "type of Request",
-						fontColor: "#5e7287",
-					},
-
-
-				}],
-                xAxes: [{
-					categoryPercentage: 1.0,
-					barPercentage:1.0,
-					barThickness:'flex',
-                    gridLines: {
-                        color: "#e2e2e2",
-                    //    zeroLineColor: "#5e7287",
-                        display: true,
-						lineWidth:.5,
-                        borderDash: [3, 8],
-						zeroLineWidth: 0,
-                    },
-                    scaleLabel: {
-                        display: true,
-                        labelString: "total of Durations",
-						fontColor: "#5e7287",
-                    },
-                    beginAtZero: true,
-                    ticks: {
-                        autoSkip: false,
-                        min: 0,
-                        max: durationMax,
-                    //    stepSize: durationMax/count,
-                    },
-
-                }]
-            },
-            elements: {
-                rectangle: {
-                    borderSkipped: [ 'left', 'right', 'top', 'bottom' ],
-                },
-                line: {
-                    fill: false
-                }
-            },
-            plugins: {
-                legend: false,
-                //    title: false
-            },
-            title: {
-                display: true,
-                text: 'total of Durations',
-				fontColor: "#5e7287",
-            },
-/*
-*/
-        }
-	});
+         },
+         options: {
+             //   maintainAspectRatio: false,
+             tooltips: {
+                 callbacks: {
+                     label: function (t, d) {
+                         if (t.datasetIndex === 0) {
+                             return $tooltips[t.index]['total'];
+                         } else if (t.datasetIndex === 1) {
+                             return $tooltips[t.index]['success'];
+                         } else if (t.datasetIndex === 2) {
+                             return $tooltips[t.index]['fail'];
+                         }
+                     }
+                 },
+                 cornerRadius: 10,
+                 caretSize: 10,
+                 xPadding: 10,
+                 yPadding: 12,
+                 backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                 titleFontStyle: 'normal',
+                 titleMarginBottom: 15
+             },
+             legend: {
+                 display: true,
+                 position: 'top',//
+                 labels: {
+                     //    boxWidth: 20,
+                     fontColor: 'rgb(60, 180, 100)',
+                     padding: 0,
+                     //     boxHeight:80,
+                 },
+             },
+             scales: {
+                 yAxes: [{
+                     categoryPercentage: .96,
+                     barPercentage: .96,
+                     barThickness: 'flex',
+                     //   barThickness: 20,
+                     gridLines: {
+                         color: "#f7f7f7",
+                         display: true,
+                         lineWidth: .5,
+                         //	zeroLineColor: "#5e7287",
+                         zeroLineWidth: 0,
+                         //    borderDash: [2, 5],
+                     },
+                     beginAtZero: true,
+                     ticks: {
+                         autoSkip: false,
+                         padding: leftSpace,
+                     },
+                     scaleLabel: {
+                         display: true,
+                         labelString: "type of Request",
+                         fontColor: "#5e7287",
+                     },
+                 }],
+                 xAxes: [{
+                     categoryPercentage: 1.0,
+                     barPercentage: 1.0,
+                     barThickness: 'flex',
+                     gridLines: {
+                         color: "#e2e2e2",
+                         //    zeroLineColor: "#5e7287",
+                         display: true,
+                         lineWidth: .5,
+                         borderDash: [3, 8],
+                         zeroLineWidth: 0,
+                     },
+                     scaleLabel: {
+                         display: true,
+                         labelString: "total of Durations",
+                         fontColor: "#5e7287",
+                     },
+                     beginAtZero: true,
+                     ticks: {
+                         autoSkip: false,
+                         min: 0,
+                         max: durationMax,
+                         //    stepSize: durationMax/count,
+                     },
+                 }]
+             },
+             elements: {
+                 rectangle: {
+                     borderSkipped: ['left', 'right', 'top', 'bottom'],
+                 },
+                 line: {
+                     fill: false
+                 }
+             },
+             plugins: {
+                 legend: false,
+                 //    title: false
+             },
+             title: {
+                 display: true,
+                 text: 'total of Durations',
+                 fontColor: "#5e7287",
+             },
+         }
+     });
 
  };
 

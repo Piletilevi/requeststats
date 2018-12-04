@@ -297,13 +297,13 @@ requestName
                 'Durations'=>$value['Durations']
             ) ;
          }
-/*
-      echo "<pre>";
-         print_r($resultEnd);
-        echo "</pre>";
-*/
         return $resultEnd;
     }
+    /*
+          echo "<pre>";
+             print_r($resultEnd);
+            echo "</pre>";
+    */
 
     public function totalSuccessDurationsByReqName($criteria)
     {

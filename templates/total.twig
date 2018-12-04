@@ -96,7 +96,7 @@
     #}
     <div class="panel panel-default">
         <div class="panel-body chartBar">
-            <canvas id="popChartTotal" height="320"  data-names="{{ totalChart | json_encode }}"></canvas>
+            <canvas id="popChartTotal" height="{{ rowCount }}" data-names="{{ totalChart | json_encode }}"></canvas>
         </div>
     </div>
 </div>
