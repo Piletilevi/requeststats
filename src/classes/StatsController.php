@@ -450,6 +450,7 @@ var_dump($names);
         $durations = $calc->queryDurationAvgs($calcCriteria);
 
         $names = $calc->totalDurationsByReqName($calcCriteria);
+        $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
 var_dump($names);
 
         $calc->setStatus(StatsManager::STATUS_SUCCESS);
@@ -535,6 +536,7 @@ var_dump($names);
 
         return $view->render($response, 'total.twig', [
             'totalChart'    => $names,
+            'totalSuccessChart'    => $namesSuccess,
             'requests'      => $requests,
             'params'        => $params,
             'modes'         => static::$modeNames,
