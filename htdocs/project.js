@@ -122,7 +122,49 @@ function popChartCompare() {
 		}
 	});
 };
+var $backgroundColors=[
+    '#ff2f65',
+    '#00856A',
+    '#f04e00',
+    '#9966FF',
+    '#1FC75A',
+    '#1abadc',
+    '#ff3647',
+    '#008080',
+    '#FF00FF',
+    '#e9721b',
+    '#cd7a00',
+    '#6900ac',
+    '#20B2AA',
+    '#2666e7',
+    '#FF6384',
+    '#00b940',
+    '#ff862f',
+    '#8A2BE2',
+    '#CD853F',
+    '#EB0000',
+    '#9966FF',
+    '#9ACD32',
+    '#e55120',
+    '#CD5C5C',
+    '#6938a4',
+    '#85b32e',
+    '#FF9F40',
+    '#F08080',
+    '#afa423',
+    '#0015D6',
+    '#A0522D',
+    '#4BC0C0',
+    '#D6005D',
+    '#ffb948',
+    '#483D8B',
+    '#529fff',
+    '#556B2F',
+    '#00ebab',
+    '#b73f16',
+];
 
+//console.log($bgColors)
  function popChartTotal() {
 
 	/*
@@ -160,13 +202,22 @@ function popChartCompare() {
 		duration: $names[i].duration,
 		WeekDay: $names[i].WeekDay,*/
 	var $tooltips =[];
+	var count =0;
      Object.keys($names).map(function(key, i) {
          $labels[i] = key;
           $durations[i] = $names[key].Durations;
           $tooltips[i] = 'Success Requests: ' + $names[key].Success + '\r\nTotal Requests: ' + $names[key].Requests;
      //    console.log(key+', '+$names[key].Durations+', '+$tooltips[i]);
+         count =i;
      });
-
+     var durationMax = Math.max.apply(null, $durations);
+     var $backgroundColorsRGBA=[];
+     $backgroundColors.forEach(function (bgColor, i) {
+         if(i<=count){
+             $backgroundColorsRGBA[i] = hex2rgba(bgColor, 70);
+         }
+     });
+     var leftSpace=100;
 /*
      Object.keys(fonts).map(i => ({
          family: fonts[i].family,
@@ -180,59 +231,18 @@ function popChartCompare() {
 		data: {
 			labels: $labels,
 			datasets: [{
-				label: 'Duration',
-				data: $durations,
+title:"total of Durations",
+                data: $durations,
                 tooltipItems: $tooltips,
-				backgroundColor: [
-					'#FF6384',
-					'#00856A',
-					'#D2691E',
-					'#9966FF',
-					'#6938a4',
-					'#FF6384',
-					'#6B8E23',
-					'#008080',
-					'#1FC75A',
-					'#E9967A',
-					'#9E5700',
-					'#CD853F',
-					'#4B0082',
-					'#20B2AA',
-					'#4BC0C0',
-					'#6897bb',
-					'#FF6384',
-					'#2F4F4F',
-					'#ffdab9',
-					'#8A2BE2',
-					'#FF00FF',
-					'#EB0000',
-					'#9966FF',
-					'#9ACD32',
-					'#e55120',
-					'#CD5C5C',
-					'#6938a4',
-					'#FF9F40',
-					'#556B2F',
-					'#F08080',
-					'#ffee84',
-					'#0015D6',
-					'#A0522D',
-					'#D6005D',
-					'#8B4513',
-					'#FFCE56',
-					'#483D8B',
-					'#F4A460',
-					'#36A2EB',
-				],
-			},
-/*
-				{
-                label: 'tooltipItem',
-                data: $tooltips,
-                fill: false,
-            }
-*/
-            ],
+                backgroundColor: $backgroundColorsRGBA,
+                /*
+                               {
+                                label: 'tooltipItem',
+                                data: $tooltips,
+                                fill: false,
+                            }
+                */
+            }],
 
         },
         options: {
@@ -262,7 +272,7 @@ function popChartCompare() {
             },
             legend: {
                 display: true,
-                //     position: 'bottom',
+                position: 'top',//
                 labels: {
                     //    boxWidth: 20,
                     fontColor: 'rgb(60, 180, 100)',
@@ -275,13 +285,16 @@ function popChartCompare() {
                     barPercentage: 1,
                 //    barThickness: 60,
                     gridLines: {
-						display: true,
-						zeroLineColor: "black",
+                        color: "#ffffff",
+                        display: true,
+						zeroLineColor: "#000000",
 						zeroLineWidth: 1,
+                        borderDash: [2, 5],
                     },
                     beginAtZero: true,
                     ticks: {
-                        autoSkip: false
+                        autoSkip: false,
+                        padding: leftSpace,
                     },
 					scaleLabel: {
 						display: true,
@@ -291,21 +304,47 @@ function popChartCompare() {
 
 				}],
                 xAxes: [{
+                    barPercentage: 0.6,
                     gridLines: {
-                        zeroLineColor: "black",
+                        color: "#e2e2e2",
+                        lineWidth:1,
+                        zeroLineColor: "#000000",
                         zeroLineWidth: 1,
-						display: true
+                        display: true,
+                        borderDash: [3, 8],
                     },
                     scaleLabel: {
                         display: true,
-                        labelString: "total of Durations"
+                        labelString: "total of Durations",
                     },
                     beginAtZero: true,
                     ticks: {
-                        autoSkip: false
-                    }
+                        autoSkip: false,
+                        min: 0,
+                        max: durationMax,
+                    //    stepSize: durationMax/count,
+                    },
+
                 }]
             },
+            elements: {
+                rectangle: {
+                    borderSkipped: 'left',
+                },
+                line: {
+                    fill: false
+                }
+            },
+            plugins: {
+                legend: false,
+                //    title: false
+            },
+            title: {
+                display: true,
+                text: 'total of Durations'
+            },
+/*
+*/
         }
 	});
 
@@ -313,7 +352,7 @@ function popChartCompare() {
 
 // Define a plugin to provide data labels
 Chart.plugins.register({
-	afterDatasetsDraw: function(chart) {
+	beforeDatasetsDraw: function(chart) {
 		var ctx = chart.ctx;
 
 		chart.data.datasets.forEach(function(dataset, i) {
@@ -321,10 +360,8 @@ Chart.plugins.register({
 			if (!meta.hidden) {
 				meta.data.forEach(function(element, index) {
 					// Draw the text in black, with the specified font
-				//	ctx.fillStyle = 'rgb(7, 7, 7)';
-					ctx.strokeStyle = dataset.backgroundColor[index];
-					ctx.fillStyle = dataset.backgroundColor[index];
-				//	console.log(getRgba(ctx.fillStyle));
+					ctx.strokeStyle = $backgroundColors[index];
+					ctx.fillStyle = $backgroundColors[index];
 
 					var fontSize = 14;
 					var lineHeight = 1.2;
@@ -336,24 +373,23 @@ Chart.plugins.register({
 					var dataString = dataset.data[index].toString();
 
 					// Make sure alignment settings are correct
-					ctx.textAlign = 'left';
+				//	ctx.textAlign = 'left';
+					ctx.textAlign = 'end';
 					ctx.textBaseline = 'middle';
 
 					var padding = 10;
 					var position = element.tooltipPosition();
-					ctx.fillText(dataString, position.x+padding, position.y +  (fontSize*lineHeight-fontSize)/2);
+					ctx.fillText(dataString, 200, position.y +  (fontSize*lineHeight-fontSize)/2);
 				});
 			}
 		});
 	}
 });
 
-function hex2rgba(hex,opacity){
-	hex = hex.slice(1,5);
-	r = parseInt(hex.substring(0,2), 16);
-	g = parseInt(hex.substring(2,4), 16);
-	b = parseInt(hex.substring(4,6), 16);
-
-	result = 'rgba('+r+','+g+','+b+','+opacity/100+')';
-	return result;
+function hex2rgba(hex,opacity=100) {
+    hex=hex.slice(1);
+    return 'rgba(' +
+        parseInt(hex.slice(0,2),16) + ',' +
+        parseInt(hex.slice(2,4),16) + ',' +
+        parseInt(hex.slice(4),16) + ',' + opacity/100 + ')';
 }

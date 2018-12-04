@@ -23,16 +23,17 @@ class StatsCalc
     ];
     protected static $groupingFormulasTotal = [
         self::CRITERIA_HOURS            => 'DATE_FORMAT(`statDateTime`, "%Y-%m-%d %H")',
-        self::CRITERIA_DAYS             => 'DATE(`statDateTime`)',
+        self::CRITERIA_DAYS             => 'statDate',
         // CRITERIA_WEEKS generates date of monday
-        self::CRITERIA_WEEKS            => 'DATE(DATE_ADD(`statDateTime`, INTERVAL(-WEEKDAY(`statDateTime`)) DAY))',
-        self::CRITERIA_HOURS_AGGREGATED => 'HOUR(`statDateTime`)',
-        self::CRITERIA_DAYS_AGGREGATED  => 'WEEKDAY(`statDateTime`)',
+        self::CRITERIA_WEEKS            => 'DATE(DATE_ADD(`statDate`, INTERVAL(-WEEKDAY(`statDate`)) DAY))',
+        self::CRITERIA_HOURS_AGGREGATED => 'HOUR(`statTime`)',
+        self::CRITERIA_DAYS_AGGREGATED  => 'WEEKDAY(`statDate`)',
     ];
     /*** @var Connection */
     protected $db;
     protected $startStamp = 0;
     protected $endStamp = 0;
+    protected $setDate = 0;
     protected $status = self::STATUS_ANY;
     protected $requestId = self::REQUEST_ANY;
 
@@ -60,7 +61,10 @@ class StatsCalc
     {
         $this->startStamp = (int)$startStamp;
     }
-
+    public function setDate($setDate)
+    {
+        $this->setDate = date('Y-m-d',$setDate);
+    }
     /**
      * @param int $status
      */
@@ -212,14 +216,14 @@ class StatsCalc
         return $qr;
     }
     protected function queryTotalDurationsByReqName($criteria, $statExpression=false)
-    {
+    {var_dump(date('Y-m-d', $this->startStamp));var_dump(date('Y-m-d', $this->endStamp));
          if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
             throw new \InvalidArgumentException();
         }
-        $groupExpression = static::$groupingFormulasTotal[$criteria];
+    //    $groupExpression = static::$groupingFormulasTotal[$criteria];
 
         $query = $this->db->table('total_stat')
-            ->selectRaw("$groupExpression AS criteria, 
+            ->selectRaw("
 SUM(duration) AS Durations,
 requestName,
 SUM(statStatus) AS successStatuses,

@@ -10,3 +10,6 @@
 .form-inline label {
     margin-left: 0.5em;
 }
+.chartBar canvas{
+/*padding-right: 10em;*/
+}

@@ -415,7 +415,7 @@ var_dump($names);
         $startDate->setTime(0, 0, 0);
         $endDate->setTime(23, 59, 59);
         // do some sanity checks
-        if ($calcCriteria === StatsCalc::CRITERIA_DAYS && $startDate->format('Y-m-d') === $endDate->format('Y-m-d')) {
+/*        if ($calcCriteria === StatsCalc::CRITERIA_DAYS && $startDate->format('Y-m-d') === $endDate->format('Y-m-d')) {
             // otherwise there would be a single point on the chart, not very useful
             $startDate->modify('-1 day');
         } elseif ($calcCriteria === StatsCalc::CRITERIA_WEEKS) {
@@ -441,7 +441,7 @@ var_dump($names);
             if ($endDate > $copy) {
                 $endDate = $copy;
             }
-        }
+        }*/
         /**@var $calc \app\StatsCalc* */
         $calc = $this->container->get('stats_calc');
         $calc->setStartStamp($startDate->getTimestamp());
