@@ -215,6 +215,7 @@ class StatsCalc
          $qr =  $query->get("requestName, duration, statDate, statTime, statWeekDay");
         return $qr;
     }
+
     protected function queryTotalDurationsByReqName($criteria, $statExpression=false)
     {var_dump(date('Y-m-d', $this->startStamp));var_dump(date('Y-m-d', $this->endStamp));
          if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
@@ -238,6 +239,7 @@ COUNT(requestName) AS requestCount
          $qr =  $query->get("Durations, requestName, successStatuses, requestCount");
         return $qr;
     }
+
     protected function querySuccessTotalDurationsByReqName($criteria, $statExpression=false)
     {var_dump(date('Y-m-d', $this->startStamp));var_dump(date('Y-m-d', $this->endStamp));
          if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
@@ -248,9 +250,7 @@ COUNT(requestName) AS requestCount
         $query = $this->db->table('total_stat')
             ->selectRaw("
 SUM(duration) AS Durations,
-requestName,
-SUM(statStatus) AS successStatuses,
-COUNT(requestName) AS requestCount
+requestName
 ")
              ->where('statDate', '>=', date('Y-m-d', $this->startStamp))
             ->where('statDate', '<=', date('Y-m-d', $this->endStamp))
@@ -259,7 +259,7 @@ COUNT(requestName) AS requestCount
             ->orderBy('requestName', 'ASC')
             //    ->limit(100)
         ;
-         $qr =  $query->get("Durations, requestName, successStatuses, requestCount");
+         $qr =  $query->get("Durations, requestName");
         return $qr;
     }
     public function requestNameByMaxDuration($criteria)
@@ -284,6 +284,7 @@ COUNT(requestName) AS requestCount
 */
         return $resultEnd;
     }
+
     public function totalDurationsByReqName($criteria)
     {
         $result = $this->queryTotalDurationsByReqName($criteria);
@@ -303,6 +304,7 @@ COUNT(requestName) AS requestCount
 */
         return $resultEnd;
     }
+
     public function totalSuccessDurationsByReqName($criteria)
     {
         $result = $this->querySuccessTotalDurationsByReqName($criteria);
@@ -310,9 +312,7 @@ COUNT(requestName) AS requestCount
         foreach ($result as $key => $value) {
             $key = rtrim(ltrim($value['requestName'],'xml_'),'.p');
             $resultEnd[$key]=  array(
-                'Success'=>$value['successStatuses'],
-                'Requests'=>$value['requestCount'],
-                'Durations'=>$value['Durations']
+                'DurationsSuccess'=>$value['Durations']
             ) ;
          }
         return $resultEnd;

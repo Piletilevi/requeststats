@@ -173,59 +173,45 @@ var $backgroundColors=[
 	*/
 	var popCanvas = document.getElementById("popChartTotal");
 	var $names = JSON.parse(popCanvas.getAttribute('data-names'));
-	//$names['options'] = {};
 	var $labels = [];
 	var $durations= [];
-	/*fonts = Object.keys(fonts).map(i => ({
-		family: fonts[i].family,
-		weight: fonts[i].weight,
-		category: fonts[i].category
-	}));*/
-	/*
-	[].forEach.call($names, function(item,i) {
-		$labels[i] = item['Name'];
-		console.log(item['Name'])
-	});
-	$names.forEach(function(element) {
-		console.log(element);
-	});
-
-	Date: "2018:11:01"
-	Name: "sessionrefresh"
-	Time: "00:00:01"
-	WeekDay: 5
-	duration: 25
-
-
-	console.log(results);
-		arr['Name']: $names[i].Name,
-		duration: $names[i].duration,
-		WeekDay: $names[i].WeekDay,*/
+	var $durationsSuccess= [];
+	var $durationsFail= [];
 	var $tooltips =[];
 	var count =0;
+	 var leftSpace=100;
      Object.keys($names).map(function(key, i) {
+		 $tooltips[i]=[];
          $labels[i] = key;
           $durations[i] = $names[key].Durations;
-          $tooltips[i] = 'Success Requests: ' + $names[key].Success + '\r\nTotal Requests: ' + $names[key].Requests;
-     //    console.log(key+', '+$names[key].Durations+', '+$tooltips[i]);
-         count =i;
+          $durationsSuccess[i] = $names[key].DurationsSuccess;
+		 $durationsFail[i] = $names[key].Durations - $names[key].DurationsSuccess;
+          $tooltips[i]['total'] = 'Total Requests: ' + $names[key].Requests;
+          $tooltips[i]['success'] = 'Success Requests: ' + $names[key].Success;
+          $tooltips[i]['fail'] = 'Failed Requests: ' + (parseInt($names[key].Requests) -  parseInt($names[key].Success));
+         count =i+1;
      });
      var durationMax = Math.max.apply(null, $durations);
      var $backgroundColorsRGBA=[];
-     $backgroundColors.forEach(function (bgColor, i) {
-         if(i<=count){
-             $backgroundColorsRGBA[i] = hex2rgba(bgColor, 70);
-         }
-     });
-     var leftSpace=100;
-/*
-     Object.keys(fonts).map(i => ({
-         family: fonts[i].family,
-         weight: fonts[i].weight,
-         category: fonts[i].category
-     }));
-*/
-	//console.log($durations);
+
+	 var $opacityBG = [];
+	 $opacityBG['total'] = 60;
+	 $opacityBG['success'] = 90;
+	 $opacityBG['fail'] = 30;
+
+	 Object.keys($opacityBG).map(function(key, i){
+		 console.log(key) ;
+		 console.log($opacityBG[key]) ;
+		 $backgroundColorsRGBA[key] = [];
+		 $backgroundColors.forEach(function (bgColor, j) {
+			 if(j<=count){
+				 $backgroundColorsRGBA[key][j] = hex2rgba(bgColor, $opacityBG[key]);
+			 }
+		 });
+	 });
+
+
+
 	var barChart = new Chart(popCanvas, {
 		type: 'horizontalBar',
 		data: {
@@ -234,34 +220,40 @@ var $backgroundColors=[
 title:"total of Durations",
                 data: $durations,
                 tooltipItems: $tooltips,
-                backgroundColor: $backgroundColorsRGBA,
-                /*
-                               {
-                                label: 'tooltipItem',
-                                data: $tooltips,
-                                fill: false,
-                            }
-                */
-            }],
+                backgroundColor: $backgroundColorsRGBA['total'],
+				borderWidth: [0, 0, 0, 0],
+			//	borderWidth: 0.5,
+            },{
+					title:"total of Success Durations",
+					data: $durationsSuccess,
+			//		tooltipItems: $tooltips,
+			 	 	backgroundColor:  $backgroundColorsRGBA['success'],
+				borderWidth: [0, 0, 0, 0],
+				},{
+					title:"total of Failed Durations",
+					data: $durationsFail,
+			//		tooltipItems: $tooltips,
+					backgroundColor: $backgroundColorsRGBA['fail'],
+				borderWidth: [0, 0, 0, 0],
+				},
+			],
 
         },
         options: {
          //   maintainAspectRatio: false,
-            tooltips: {
-                /*
-                                    callbacks: {
-                                        label: function(tooltipItem, data) {
-                                            console.log(data)
-                                            var label = data.datasets[tooltipItem.datasetIndex].label || '';
-                console.log(data.datasets)
-                                            if (label) {
-                                                label += ': ';
-                                            }
-                                            label += Math.round(tooltipItem.yLabel * 100) / 100;
-                                            return label;
-                                        }
-                                    },
-                */
+			tooltips: {
+				callbacks: {
+					label: function (t, d) {
+ 						if (t.datasetIndex === 0) {
+							return $tooltips[t.index]['total'];
+						} else if (t.datasetIndex === 1) {
+							return $tooltips[t.index]['success'];
+						} else if (t.datasetIndex === 2) {
+							return $tooltips[t.index]['fail'];
+						}
+
+					}
+				},
                 cornerRadius: 10,
                 caretSize: 10,
                 xPadding: 10,
@@ -276,20 +268,23 @@ title:"total of Durations",
                 labels: {
                     //    boxWidth: 20,
                     fontColor: 'rgb(60, 180, 100)',
-                    padding:0,
-                    boxWidth:80,
+                    padding: 0,
+                //     boxHeight:80,
                 },
             },
             scales: {
                 yAxes: [{
-                    barPercentage: 1,
-                //    barThickness: 60,
+					categoryPercentage: .96,
+                    barPercentage:.96,
+						barThickness:'flex',
+					//   barThickness: 20,
                     gridLines: {
-                        color: "#ffffff",
+                        color: "#f7f7f7",
                         display: true,
-						zeroLineColor: "#000000",
-						zeroLineWidth: 1,
-                        borderDash: [2, 5],
+						lineWidth:.5,
+					//	zeroLineColor: "#5e7287",
+						zeroLineWidth: 0,
+                    //    borderDash: [2, 5],
                     },
                     beginAtZero: true,
                     ticks: {
@@ -298,24 +293,28 @@ title:"total of Durations",
                     },
 					scaleLabel: {
 						display: true,
-						labelString: "type of Request"
+						labelString: "type of Request",
+						fontColor: "#5e7287",
 					},
 
 
 				}],
                 xAxes: [{
-                    barPercentage: 0.6,
+					categoryPercentage: 1.0,
+					barPercentage:1.0,
+					barThickness:'flex',
                     gridLines: {
                         color: "#e2e2e2",
-                        lineWidth:1,
-                        zeroLineColor: "#000000",
-                        zeroLineWidth: 1,
+                    //    zeroLineColor: "#5e7287",
                         display: true,
+						lineWidth:.5,
                         borderDash: [3, 8],
+						zeroLineWidth: 0,
                     },
                     scaleLabel: {
                         display: true,
                         labelString: "total of Durations",
+						fontColor: "#5e7287",
                     },
                     beginAtZero: true,
                     ticks: {
@@ -329,7 +328,7 @@ title:"total of Durations",
             },
             elements: {
                 rectangle: {
-                    borderSkipped: 'left',
+                    borderSkipped: [ 'left', 'right', 'top', 'bottom' ],
                 },
                 line: {
                     fill: false
@@ -341,7 +340,8 @@ title:"total of Durations",
             },
             title: {
                 display: true,
-                text: 'total of Durations'
+                text: 'total of Durations',
+				fontColor: "#5e7287",
             },
 /*
 */
@@ -363,7 +363,7 @@ Chart.plugins.register({
 					ctx.strokeStyle = $backgroundColors[index];
 					ctx.fillStyle = $backgroundColors[index];
 
-					var fontSize = 14;
+					var fontSize = 12;
 					var lineHeight = 1.2;
 					var fontStyle = 'normal';
 					var fontFamily = 'inherit';

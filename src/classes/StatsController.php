@@ -447,11 +447,13 @@ var_dump($names);
         $calc->setStartStamp($startDate->getTimestamp());
         $calc->setEndStamp($endDate->getTimestamp());
         $calc->setRequestId($params['request']);
-        $durations = $calc->queryDurationAvgs($calcCriteria);
+        var_dump($startDate);
 
         $names = $calc->totalDurationsByReqName($calcCriteria);
         $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
-var_dump($names);
+//var_dump($names);
+//var_dump($namesSuccess);
+var_dump(array_merge_recursive($names,$namesSuccess));
 
         $calc->setStatus(StatsManager::STATUS_SUCCESS);
         $successes = $calc->queryCounts($calcCriteria);
@@ -535,8 +537,7 @@ var_dump($names);
 
 
         return $view->render($response, 'total.twig', [
-            'totalChart'    => $names,
-            'totalSuccessChart'    => $namesSuccess,
+            'totalChart'    => array_merge_recursive($names,$namesSuccess),
             'requests'      => $requests,
             'params'        => $params,
             'modes'         => static::$modeNames,
