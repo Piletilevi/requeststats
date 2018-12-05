@@ -369,7 +369,7 @@ Chart.plugins.register({
 					ctx.fillStyle = $backgroundColors[index];
 
 					var fontSize = 12;
-					var lineHeight = 1.2;
+					var lineHeight = 1;
 					var fontStyle = 'normal';
 					var fontFamily = 'inherit';
 					ctx.font = Chart.helpers.fontString(fontSize, lineHeight, fontStyle, fontFamily);
