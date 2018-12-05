@@ -216,19 +216,19 @@ var $backgroundColors=[
          data: {
              labels: $labels,
              datasets: [{
-                 title: "total of Durations",
+                 label: "total of Durations",
                  data: $durations,
                  tooltipItems: $tooltips,
                  backgroundColor: $backgroundColorsRGBA['total'],
                  borderWidth: [0, 0, 0, 0],
                  //	borderWidth: 0.5,
              }, {
-                 title: "total of Success Durations",
+                 label: "total of Success Durations",
                  data: $durationsSuccess,
                  backgroundColor: $backgroundColorsRGBA['success'],
                  borderWidth: [0, 0, 0, 0],
              }, {
-                 title: "total of Failed Durations",
+                 label: "total of Failed Durations",
                  data: $durationsFail,
                  backgroundColor: $backgroundColorsRGBA['fail'],
                  borderWidth: [0, 0, 0, 0],
@@ -256,17 +256,29 @@ var $backgroundColors=[
                  yPadding: 12,
                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
                  titleFontStyle: 'normal',
-                 titleMarginBottom: 15
+                 titleMarginBottom: 15,
+             //    intersect: false,
+                 mode: 'index',
              },
              legend: {
                  display: true,
                  position: 'top',//
                  labels: {
+                     usePointStyle:true,
                      //    boxWidth: 20,
-                     fontColor: 'rgb(60, 180, 100)',
-                     padding: 0,
-                     //     boxHeight:80,
+                     fontColor: '#093342',
+                     padding: 30,
                  },
+                 onHover: function(e) {
+                     e.target.style.cursor = 'pointer';
+                 }
+             },
+             hover: {
+                 onHover: function(e) {
+                     var point = this.getElementAtEvent(e);
+                     if (point.length) e.target.style.cursor = 'pointer';
+                     else e.target.style.cursor = 'default';
+                 }
              },
              scales: {
                  yAxes: [{
@@ -328,7 +340,7 @@ var $backgroundColors=[
                  }
              },
              plugins: {
-                 legend: false,
+                 //legend: false,
                  //    title: false
              },
              title: {
@@ -340,7 +352,9 @@ var $backgroundColors=[
      });
 
  };
-
+Chart.Legend.prototype.afterFit = function() {
+    this.height = this.height + 40;
+};
 // Define a plugin to provide data labels
 Chart.plugins.register({
 	beforeDatasetsDraw: function(chart) {
@@ -376,7 +390,6 @@ Chart.plugins.register({
 		});
 	}
 });
-
 function hex2rgba(hex,opacity=100) {
     hex=hex.slice(1);
     return 'rgba(' +

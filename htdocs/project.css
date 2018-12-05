@@ -13,3 +13,29 @@
 .chartBar canvas{
 /*padding-right: 10em;*/
 }
+
+@media (min-width: 1300px){
+	.container {
+		width: 1270px;
+	}
+}
+@media (min-width: 1400px){
+	.container {
+		width: 1370px;
+	}
+}
+@media (min-width: 1500px){
+	.container {
+		width: 1470px;
+	}
+}
+@media (min-width: 1600px){
+	.container {
+		width: 1570px;
+	}
+}
+@media (min-width: 1700px){
+	.container {
+		width: 1670px;
+	}
+}

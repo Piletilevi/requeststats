@@ -386,9 +386,11 @@ var_dump($names);
         /**@var $dateTimeHandler \app\DateTimeHandler* */
         $dateTimeHandler = $this->container->get('datetime_handler');
         $currentDateString = $dateTimeHandler->getCurrentDateString();
+        $monthAgoDateString = $dateTimeHandler->getMonthAgoDateString();
+        var_dump($monthAgoDateString);
         $defaultParams = [
             'mode'    => 'hours',
-            'date'    => $currentDateString . ' - ' . $currentDateString,
+            'date'    => $monthAgoDateString[0] . ' - ' . $monthAgoDateString[1],
             'request' => 0
         ];
         $params = $request->getQueryParams() + $defaultParams;
@@ -538,7 +540,7 @@ var_dump(array_merge_recursive($names,$namesSuccess));
 $total = array_merge_recursive($names,$namesSuccess);
         return $view->render($response, 'total.twig', [
             'totalChart'    => $total,
-            'rowCount'      => count($total)*3*6,
+            'rowCount'      => count($total)*3*4,
             'requests'      => $requests,
             'params'        => $params,
             'modes'         => static::$modeNames,

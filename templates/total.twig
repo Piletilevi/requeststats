@@ -53,7 +53,7 @@
                     <label for="form-control-date" class="control-label">Date</label>
                     <input type="text" name="date" class="daterangeinput form-control" id="form-control-date" value="{{ params.date }}">
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="display: none">
                     <label for="form-control-request" class="control-label">Request</label>
                     <select name="request" class="selectpicker form-control col-undoselectpickerfullwidthstyle" id="form-control-request">
                         <option value=""{% if not params.request %} selected="selected"{% endif %}>All</option>
@@ -62,7 +62,7 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" style="display: none">
                     <label for="form-control-mode" class="control-label">Mode</label>
                     <select name="mode" class="selectpicker form-control col-undoselectpickerfullwidthstyle" id="form-control-mode">
                         {% for item in modes %}
