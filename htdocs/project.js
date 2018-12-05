@@ -166,10 +166,6 @@ var $backgroundColors=[
 //console.log($bgColors)
  function popChartTotal() {
 
-	/*
-	var popCanvas = $("#popChart");
-	var popCanvas = document.getElementById("popChart").getContext("2d");
-	*/
 	 var popCanvas = document.getElementById("popChartTotal");
 	 var $names = JSON.parse(popCanvas.getAttribute('data-names'));
 	 var $labels = [];
@@ -406,8 +402,7 @@ var $backgroundColors=[
          }
      });
 
-
- };
+}
 function hex2rgba(hex,opacity=100) {
     hex=hex.slice(1);
     return 'rgba(' +
