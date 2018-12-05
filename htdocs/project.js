@@ -174,7 +174,7 @@ var $backgroundColors=[
 	 var $durationsFail = [];
 	 var $tooltips = [];
 	 var count = 0;
-	 var leftSpace = 100;
+	 var leftSpace = 210;
 	 Object.keys($names).map(function(key, i) {
 		 $tooltips[i] = [];
 		 $labels[i] = key;
@@ -255,39 +255,53 @@ var $backgroundColors=[
          type: 'horizontalBar',
          data: {
              labels: $labels,
-             datasets: [{
-                 label: "total of Durations",
-                 data: $durations,
-                 backgroundColor: $backgroundColorsRGBA['total'],
-                 borderWidth: [0, 0, 0, 0],
-                 //	borderWidth: 0.5,
-             }, {
-                 label: "total of Success Durations",
-                 data: $durationsSuccess,
-                 backgroundColor: $backgroundColorsRGBA['success'],
-                 borderWidth: [0, 0, 0, 0],
-             }, {
-                 label: "total of Failed Durations",
-                 data: $durationsFail,
-                 backgroundColor: $backgroundColorsRGBA['fail'],
-                 borderWidth: [0, 0, 0, 0],
-             },
+             datasets: [
+/*
+				 {
+				 	category: 'total',
+					 label: "total of Durations",
+					 data: $durations,
+					 backgroundColor: $backgroundColorsRGBA['total'],
+					 borderWidth: [0, 0, 0, 0],
+					 //	borderWidth: 0.5,
+					 hidden: true,
+				 },
+*/
+				 {
+					 category: 'success',
+					 label: "total of Success Durations",
+					 data: $durationsSuccess,
+					 backgroundColor: $backgroundColorsRGBA['success'],
+					 borderWidth: [0, 0, 0, 0],
+				 },
+				 {
+					 category: 'fail',
+					 label: "total of Failed Durations",
+					 data: $durationsFail,
+					 backgroundColor: $backgroundColorsRGBA['fail'],
+					 borderWidth: [0, 0, 0, 0],
+				 },
              ],
 
          },
          options: {
              //   maintainAspectRatio: false,
              tooltips: {
+				 mode: 'label',
                  callbacks: {
                      label: function (t, d) {
-                         if (t.datasetIndex === 0) {
-                             return $tooltips[t.index]['total'];
-                         } else if (t.datasetIndex === 1) {
+                     	let cat = d.datasets[t.datasetIndex].category;
+                         if (cat === 'success') {
                              return $tooltips[t.index]['success'];
-                         } else if (t.datasetIndex === 2) {
+                         } else if (cat === 'fail') {
                              return $tooltips[t.index]['fail'];
+                         } else if (cat === 'total') {
+                             return $tooltips[t.index]['total'];
                          }
-                     }
+                     },
+					 footer:  function(t, d) {
+						 return $tooltips[t[0].index]['total'] // data.labels[tooltipItems.index] ;
+					 },
                  },
                  cornerRadius: 10,
                  caretSize: 10,
@@ -297,12 +311,13 @@ var $backgroundColors=[
                  titleFontStyle: 'normal',
                  titleMarginBottom: 15,
             //   intersect: false,
-                 mode: 'index',
 			//	 axis: 'x',
 				 bodyFontFamily:"'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
 			//	 bodyFontSize:12,
 				 bodySpacing: 6,
 			//	 bodyFontStyle: '600',
+				 footerFontSize:14,
+				 footerFontStyle: '400',
              },
 
              legend: {
@@ -333,6 +348,7 @@ var $backgroundColors=[
                      barPercentage: .96,
                      barThickness: 'flex',
                      //   barThickness: 20,
+					 stacked: true,
                      gridLines: {
                          color: "#f7f7f7",
                          display: true,
@@ -358,7 +374,8 @@ var $backgroundColors=[
                      categoryPercentage: 1.0,
                      barPercentage: 1.0,
                      barThickness: 'flex',
-                     gridLines: {
+					 stacked: true,
+					 gridLines: {
                          color: "#e2e2e2",
                          //    zeroLineColor: "#5e7287",
                          display: true,
