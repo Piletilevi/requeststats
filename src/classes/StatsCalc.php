@@ -242,7 +242,7 @@ requestName
 /*
  * VIEW `total_stat`
  *
- * 
+ *
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_stat` AS
 select `stat`.`id` AS `statId`,
 `stat`.`time` AS `statDateTime`,
