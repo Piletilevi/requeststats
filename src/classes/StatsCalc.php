@@ -217,7 +217,8 @@ class StatsCalc
     }
 
     protected function queryTotalDurationsByReqName($criteria, $statExpression=false)
-    {var_dump(date('Y-m-d', $this->startStamp));var_dump(date('Y-m-d', $this->endStamp));
+    {
+        //var_dump(date('Y-m-d', $this->startStamp));var_dump(date('Y-m-d', $this->endStamp));
          if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
             throw new \InvalidArgumentException();
         }
@@ -241,7 +242,8 @@ COUNT(requestName) AS requestCount
     }
 
     protected function querySuccessTotalDurationsByReqName($criteria, $statExpression=false)
-    {var_dump(date('Y-m-d', $this->startStamp));var_dump(date('Y-m-d', $this->endStamp));
+    {
+        //var_dump(date('Y-m-d', $this->startStamp));var_dump(date('Y-m-d', $this->endStamp));
          if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
             throw new \InvalidArgumentException();
         }

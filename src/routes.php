@@ -27,5 +27,4 @@ $app->get('/aggregate', function (Request $request, Response $response, array $a
 //    $this->logger->info("Slim-Skeleton '/' route");
 //    return $this->view->render($response, 'index.twig', $args);
 //});
-
 $app->get('/[{mode}]', StatsController::class . ':total')->setName('stats');

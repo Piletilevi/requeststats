@@ -387,8 +387,9 @@ var_dump($names);
         $dateTimeHandler = $this->container->get('datetime_handler');
         $currentDateString = $dateTimeHandler->getCurrentDateString();
         $monthAgoDateString = $dateTimeHandler->getMonthAgoDateString();
-        var_dump($monthAgoDateString);
+    //    var_dump($monthAgoDateString);
         $defaultParams = [
+            'what'    => 'total',
             'mode'    => 'hours',
             'date'    => $monthAgoDateString[0] . ' - ' . $monthAgoDateString[1],
             'request' => 0
@@ -449,20 +450,21 @@ var_dump($names);
         $calc->setStartStamp($startDate->getTimestamp());
         $calc->setEndStamp($endDate->getTimestamp());
         $calc->setRequestId($params['request']);
-        var_dump($startDate);
+    //    var_dump($startDate);
 
         $names = $calc->totalDurationsByReqName($calcCriteria);
         $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
 //var_dump($names);
 //var_dump($namesSuccess);
-var_dump(array_merge_recursive($names,$namesSuccess));
 
-        $calc->setStatus(StatsManager::STATUS_SUCCESS);
+/*        $calc->setStatus(StatsManager::STATUS_SUCCESS);
         $successes = $calc->queryCounts($calcCriteria);
         $calc->setStatus(StatsManager::STATUS_FAIL);
         $fails = $calc->queryCounts($calcCriteria);
+*/
 
 
+/*
         $nameChart = new ChartComponent();
         $nameChart->options->scales->xAxes[0]->scaleLabel->labelString = 'ReqName';
         $nameChart->options->scales->yAxes[0]->scaleLabel->labelString = 'Count';
@@ -527,17 +529,14 @@ var_dump(array_merge_recursive($names,$namesSuccess));
 
         foreach ($segments as $segment) {
             $name = isset($names[$segment]) ? $names[$segment] : 0;
-/*
-            $successCount = isset($successes[$segment]) ? $successes[$segment] : 0;
-            $failCount = isset($fails[$segment]) ? $fails[$segment] : 0;
-*/
             $nameDataset->data[] = $name[$segment]['duration'];
         }
-    //    var_dump($nameDataset);
+*/
         $requests = $statsManager->queryRequestNames();
 
 
-$total = array_merge_recursive($names,$namesSuccess);
+        $total = array_merge_recursive($names,$namesSuccess);
+        var_dump($total);
         return $view->render($response, 'total.twig', [
             'totalChart'    => $total,
             'rowCount'      => count($total)*3*4,
