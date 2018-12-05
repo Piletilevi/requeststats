@@ -17,7 +17,6 @@
 		}
 		var chart = new Chart(canvasElement, params);
 	}
-    console.log(params);
 	$('.datepicker').daterangepicker({
 		singleDatePicker: true,
 		locale: {
@@ -171,26 +170,27 @@ var $backgroundColors=[
 	var popCanvas = $("#popChart");
 	var popCanvas = document.getElementById("popChart").getContext("2d");
 	*/
-	var popCanvas = document.getElementById("popChartTotal");
-	var $names = JSON.parse(popCanvas.getAttribute('data-names'));
-	var $labels = [];
-	var $durations= [];
-	var $durationsSuccess= [];
-	var $durationsFail= [];
-	var $tooltips =[];
-	var count =0;
-	 var leftSpace=100;
-     Object.keys($names).map(function(key, i) {
-		 $tooltips[i]=[];
-         $labels[i] = key;
-          $durations[i] = $names[key].Durations;
-          $durationsSuccess[i] = $names[key].DurationsSuccess;
+	 var popCanvas = document.getElementById("popChartTotal");
+	 var $names = JSON.parse(popCanvas.getAttribute('data-names'));
+	 var $labels = [];
+	 var $durations = [];
+	 var $durationsSuccess = [];
+	 var $durationsFail = [];
+	 var $tooltips = [];
+	 var count = 0;
+	 var leftSpace = 100;
+	 Object.keys($names).map(function(key, i) {
+		 $tooltips[i] = [];
+		 $labels[i] = key;
+		 $durations[i] = $names[key].Durations;
+		 $durationsSuccess[i] = $names[key].DurationsSuccess;
 		 $durationsFail[i] = $names[key].Durations - $names[key].DurationsSuccess;
-          $tooltips[i]['total'] = 'Total Requests: ' + $names[key].Requests;
-          $tooltips[i]['success'] = 'Success Requests: ' + $names[key].Success;
-          $tooltips[i]['fail'] = 'Failed Requests: ' + (parseInt($names[key].Requests) -  parseInt($names[key].Success));
-         count =i+1;
-     });
+		 //formatter_dec_0.format(dataString);
+		 $tooltips[i]['total'] = 'Total Requests: ' + formatter_dec_0.format($names[key].Requests);
+		 $tooltips[i]['success'] = 'Success Requests: ' + formatter_dec_0.format($names[key].Success);
+		 $tooltips[i]['fail'] = 'Failed Requests: ' + formatter_dec_0.format((parseInt($names[key].Requests) - parseInt($names[key].Success)));
+		 count = i + 1;
+	 });
      var durationMax = Math.max.apply(null, $durations);
      var $backgroundColorsRGBA=[];
 
@@ -200,8 +200,8 @@ var $backgroundColors=[
 	 $opacityBG['fail'] = 24;
 
 	 Object.keys($opacityBG).map(function(key, i){
-		 console.log(key) ;
-		 console.log($opacityBG[key]) ;
+		// console.log(key) ;
+		// console.log($opacityBG[key]) ;
 		 $backgroundColorsRGBA[key] = [];
 		 $backgroundColors.forEach(function (bgColor, j) {
 			 if(j<=count){
@@ -210,15 +210,58 @@ var $backgroundColors=[
 		 });
 	 });
 
+	 Chart.defaults.global.defaultFontFamily = 'Encode Sans Condensed';
+	 Chart.defaults.global.defaultFontSize = 12;
 
-     var barChart = new Chart(popCanvas, {
+	 Chart.Legend.prototype.afterFit = function() {
+		 this.height = this.height + 50;
+	 };
+	 // Define a plugin to provide data labels
+	 Chart.plugins.register({
+		 beforeDatasetsDraw: function(chart) {
+			 var ctx = chart.ctx;
+
+			 chart.data.datasets.forEach(function(dataset, i) {
+				 var meta = chart.getDatasetMeta(i);
+				 if (!meta.hidden) {
+					 meta.data.forEach(function(element, index) {
+						 // Draw the text in black, with the specified font
+						 ctx.strokeStyle = $backgroundColors[index];
+						 ctx.fillStyle = $backgroundColors[index];
+
+						 var fontSize = 12;
+						 var lineHeight = 1;
+						 var fontStyle = 'normal';
+						 var fontFamily = 'Encode Sans Condensed';//font: helpers.fontString(size, style, family)
+						 ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+						 // 	 ctx.font = Chart.helpers.fontString(fontSize, lineHeight, fontStyle);
+
+						 // Just naively convert to string for now
+						 var dataString = dataset.data[index].toString();
+						 dataString = formatter_dec_0.format(dataString);
+
+						 // Make sure alignment settings are correct
+						 //	ctx.textAlign = 'left';
+						 ctx.textAlign = 'end';
+						 ctx.textBaseline = 'middle';
+
+						 var padding = 10;
+						 var position = element.tooltipPosition();
+						 ctx.fillText(dataString, 220, position.y +  (fontSize*lineHeight-fontSize)/2);
+					 });
+				 }
+			 });
+		 }
+	 });
+
+
+	 var barChart = new Chart(popCanvas, {
          type: 'horizontalBar',
          data: {
              labels: $labels,
              datasets: [{
                  label: "total of Durations",
                  data: $durations,
-                 tooltipItems: $tooltips,
                  backgroundColor: $backgroundColorsRGBA['total'],
                  borderWidth: [0, 0, 0, 0],
                  //	borderWidth: 0.5,
@@ -257,16 +300,24 @@ var $backgroundColors=[
                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
                  titleFontStyle: 'normal',
                  titleMarginBottom: 15,
-             //    intersect: false,
+            //   intersect: false,
                  mode: 'index',
+			//	 axis: 'x',
+				 bodyFontFamily:"'Helvetica Neue', 'Helvetica', 'Arial', sans-serif",
+			//	 bodyFontSize:12,
+				 bodySpacing: 6,
+			//	 bodyFontStyle: '600',
              },
+
              legend: {
                  display: true,
                  position: 'top',//
-                 labels: {
+
+				 labels: {
                      usePointStyle:true,
                      //    boxWidth: 20,
                      fontColor: '#093342',
+                     fontSize: 16,
                      padding: 30,
                  },
                  onHover: function(e) {
@@ -298,11 +349,13 @@ var $backgroundColors=[
                      ticks: {
                          autoSkip: false,
                          padding: leftSpace,
-                     },
+						 fontSize: 14,
+					 },
                      scaleLabel: {
                          display: true,
                          labelString: "type of Request",
                          fontColor: "#5e7287",
+						 fontSize: 16,
                      },
                  }],
                  xAxes: [{
@@ -321,6 +374,7 @@ var $backgroundColors=[
                          display: true,
                          labelString: "total of Durations",
                          fontColor: "#5e7287",
+						 fontSize: 16,
                      },
                      beginAtZero: true,
                      ticks: {
@@ -347,49 +401,13 @@ var $backgroundColors=[
                  display: true,
                  text: 'total of Durations',
                  fontColor: "#5e7287",
+				 fontSize: 16,
              },
          }
      });
 
+
  };
-Chart.Legend.prototype.afterFit = function() {
-    this.height = this.height + 40;
-};
-// Define a plugin to provide data labels
-Chart.plugins.register({
-	beforeDatasetsDraw: function(chart) {
-		var ctx = chart.ctx;
-
-		chart.data.datasets.forEach(function(dataset, i) {
-			var meta = chart.getDatasetMeta(i);
-			if (!meta.hidden) {
-				meta.data.forEach(function(element, index) {
-					// Draw the text in black, with the specified font
-					ctx.strokeStyle = $backgroundColors[index];
-					ctx.fillStyle = $backgroundColors[index];
-
-					var fontSize = 12;
-					var lineHeight = 1;
-					var fontStyle = 'normal';
-					var fontFamily = 'inherit';
-					ctx.font = Chart.helpers.fontString(fontSize, lineHeight, fontStyle, fontFamily);
-
-					// Just naively convert to string for now
-					var dataString = dataset.data[index].toString();
-
-					// Make sure alignment settings are correct
-				//	ctx.textAlign = 'left';
-					ctx.textAlign = 'end';
-					ctx.textBaseline = 'middle';
-
-					var padding = 10;
-					var position = element.tooltipPosition();
-					ctx.fillText(dataString, 200, position.y +  (fontSize*lineHeight-fontSize)/2);
-				});
-			}
-		});
-	}
-});
 function hex2rgba(hex,opacity=100) {
     hex=hex.slice(1);
     return 'rgba(' +
@@ -397,3 +415,15 @@ function hex2rgba(hex,opacity=100) {
         parseInt(hex.slice(2,4),16) + ',' +
         parseInt(hex.slice(4),16) + ',' + opacity/100 + ')';
 }
+
+var currentLang = document.documentElement.getAttribute('lang');
+var formatter_dec_0 = new Intl.NumberFormat(currentLang, {
+	style: "decimal",
+	useGrouping: true,
+	//  currency: "EUR",
+	//	currencyDisplay: "€",
+	//	minimumFractionDigits: 2,	//ignored if exists one of SignificantDigits
+	maximumFractionDigits: 0, //ignored if exists one of SignificantDigits
+	//	maximumSignificantDigits: 20, // if in use, FractionDigits will be ignored
+});
+

@@ -29,18 +29,19 @@ require __DIR__ . '/../src/routes.php';
 // Run app
 $app->run();
 
-echo '<div style="padding: 2em;">';
+/*
+    echo '<div style="padding: 2em;">';
 //echo $now = date('l d. F Y H:i') . '<br />';
 echo $offset =   date('Z')/3600 . '<br />';
 echo $diffGMT  =   date('P') . '<br />';
 echo $summer   =   date("I") . '<br />'; //1, если дата соответствует летнему времени, 0 в противном случае.
 
-/*
 echo IntlDateFormatter::formatObject(
          new DateTime('2013-04-01 00:00:00 Europe/Moscow'),
          'LLLL',
          'ru-RU');
 */
+/*
 $fmt = new IntlDateFormatter(
     '',
 
@@ -58,3 +59,4 @@ echo $kuupaev		=	$fmt->format(new DateTime());
 
 var_dump(getdate()) ;
 echo '</div>';
+*/

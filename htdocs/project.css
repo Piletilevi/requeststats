@@ -1,7 +1,16 @@
+body{
+	font-family: 'Encode Sans Condensed', sans-serif;
+	font-size: 18px;
+	font-weight: 400;
+}
 .navbar {
 	margin-bottom: 20px;
 }
-
+@media (min-width: 768px){
+	#navbar.navbar-right .navbar-nav {
+		float: right;
+	}
+}
 .form-inline .form-group > .form-control,
 .form-inline .form-group > .btn {
 	min-width: 6em;
