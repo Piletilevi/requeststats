@@ -235,3 +235,22 @@ requestName
         return $resultEnd;
     }
 }
+
+/*
+ * SQL
+ */
+/*
+ * VIEW `total_stat`
+ * 
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_stat` AS
+select `stat`.`id` AS `statId`,
+`stat`.`time` AS `statDateTime`,
+cast(`stat`.`time` as time) AS `statTime`,
+cast(`stat`.`time` as date) AS `statDate`,
+dayofweek(`stat`.`time`) AS `statWeekDay`,
+`stat`.`status` AS `statStatus`,
+`stat`.`duration` AS `duration`,
+(select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName`
+from `stat` order by `stat`.`id`
+
+*/
