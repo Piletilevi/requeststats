@@ -174,7 +174,9 @@ var $backgroundColors=[
 	 var $durationsFail = [];
 	 var $tooltips = [];
 	 var count = 0;
-	 var leftSpace = 210;
+	 var leftSpace = 300;
+	 var barheight = 24;
+     let space = ' ';
 	 Object.keys($names).map(function(key, i) {
 		 $tooltips[i] = [];
 		 $labels[i] = key;
@@ -182,9 +184,9 @@ var $backgroundColors=[
 		 $durationsSuccess[i] = $names[key].DurationsSuccess;
 		 $durationsFail[i] = $names[key].Durations - $names[key].DurationsSuccess;
 		 //formatter_dec_0.format(dataString);
-		 $tooltips[i]['total'] = 'Total Requests: ' + formatter_dec_0.format($names[key].Requests);
-		 $tooltips[i]['success'] = 'Success Requests: ' + formatter_dec_0.format($names[key].Success);
-		 $tooltips[i]['fail'] = 'Failed Requests: ' + formatter_dec_0.format((parseInt($names[key].Requests) - parseInt($names[key].Success)));
+		 $tooltips[i]['total'] = 'Total Requests:  ' + formatter_dec_0.format($names[key].Requests);
+		 $tooltips[i]['success'] = 'Success Requests:  ' + formatter_dec_0.format($names[key].Success);
+		 $tooltips[i]['fail'] = 'Failed Requests:  ' + formatter_dec_0.format((parseInt($names[key].Requests) - parseInt($names[key].Success)));
 		 count = i + 1;
 	 });
      var durationMax = Math.max.apply(null, $durations);
@@ -193,7 +195,7 @@ var $backgroundColors=[
 	 var $opacityBG = [];
 	 $opacityBG['total'] = 60;
 	 $opacityBG['success'] = 90;
-	 $opacityBG['fail'] = 24;
+	 $opacityBG['fail'] = 25;
 
 	 Object.keys($opacityBG).map(function(key, i){
 		// console.log(key) ;
@@ -205,6 +207,12 @@ var $backgroundColors=[
 			 }
 		 });
 	 });
+     Object.assign(
+         Chart.defaults.global, {
+             maintainAspectRatio: false,
+         //    responsive: true
+         }
+     );
 
 	 Chart.defaults.global.defaultFontFamily = 'Encode Sans Condensed';
 	 Chart.defaults.global.defaultFontSize = 12;
@@ -217,18 +225,27 @@ var $backgroundColors=[
 		 beforeDatasetsDraw: function(chart) {
 			 var ctx = chart.ctx;
 
+             var textColor = [];
+             textColor['success'] = '#fff';
+             textColor['fail'] = '#093342';
+             var dataStringTotal =[];
+             var fontSize = 12;
+             var lineHeight = 1;
+             var fontStyle = 'normal';
+             var fontFamily = 'Encode Sans Condensed';//font: helpers.fontString(size, style, family)
+             var position;
+             ctx.textAlign = 'end';
+             ctx.textBaseline = 'middle';
+             var padding = 10;
+
 			 chart.data.datasets.forEach(function(dataset, i) {
+              //   console.log(dataset.category)
 				 var meta = chart.getDatasetMeta(i);
-				 if (!meta.hidden) {
+                 if (!meta.hidden) {
 					 meta.data.forEach(function(element, index) {
 						 // Draw the text in black, with the specified font
-						 ctx.strokeStyle = $backgroundColors[index];
-						 ctx.fillStyle = $backgroundColors[index];
-
-						 var fontSize = 12;
-						 var lineHeight = 1;
-						 var fontStyle = 'normal';
-						 var fontFamily = 'Encode Sans Condensed';//font: helpers.fontString(size, style, family)
+						 ctx.fillStyle = $backgroundColorsRGBA[dataset.category][index];
+                         textColor['total'] = $backgroundColors[index];
 						 ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
 						 // 	 ctx.font = Chart.helpers.fontString(fontSize, lineHeight, fontStyle);
 
@@ -238,14 +255,22 @@ var $backgroundColors=[
 
 						 // Make sure alignment settings are correct
 						 //	ctx.textAlign = 'left';
-						 ctx.textAlign = 'end';
-						 ctx.textBaseline = 'middle';
-
-						 var padding = 10;
-						 var position = element.tooltipPosition();
-						 ctx.fillText(dataString, 220, position.y +  (fontSize*lineHeight-fontSize)/2);
+						 position = element.tooltipPosition();
+                         ctx.fillRect(280+i*80, position.y-12, 80, barheight);
+                         ctx.fillStyle = textColor[dataset.category];
+                         ctx.strokeStyle = textColor[dataset.category];
+                      //   ctx.font = 'italic 30px sans-serif';
+						 ctx.fillText(dataString, 350+i*80, position.y +  (fontSize*lineHeight-fontSize)/2);
+                         ctx.fillStyle = textColor['total'];
+                         ctx.strokeStyle = textColor['total'];
+                         if (dataStringTotal[index] !== 'is'){
+                             dataStringTotal[index] = formatter_dec_0.format($durations[index]);
+                             ctx.fillText(dataStringTotal[index]+' =', 260+i*80, position.y +  (fontSize*lineHeight-fontSize)/2);
+                             dataStringTotal[index] = 'is';
+                         }
 					 });
-				 }
+
+                 }
 			 });
 		 }
 	 });
@@ -287,16 +312,16 @@ var $backgroundColors=[
          options: {
              //   maintainAspectRatio: false,
              tooltips: {
-				 mode: 'label',
+				 mode: 'index',
                  callbacks: {
                      label: function (t, d) {
                      	let cat = d.datasets[t.datasetIndex].category;
                          if (cat === 'success') {
-                             return $tooltips[t.index]['success'];
+                             return space+ $tooltips[t.index]['success'];
                          } else if (cat === 'fail') {
-                             return $tooltips[t.index]['fail'];
+                             return space+ $tooltips[t.index]['fail'];
                          } else if (cat === 'total') {
-                             return $tooltips[t.index]['total'];
+                             return space+ $tooltips[t.index]['total'];
                          }
                      },
 					 footer:  function(t, d) {
@@ -308,7 +333,8 @@ var $backgroundColors=[
                  xPadding: 10,
                  yPadding: 12,
                  backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                 titleFontStyle: 'normal',
+                 titleFontSize:14,
+                 titleFontStyle: '400',
                  titleMarginBottom: 15,
             //   intersect: false,
 			//	 axis: 'x',
@@ -344,16 +370,16 @@ var $backgroundColors=[
              },
              scales: {
                  yAxes: [{
-                     categoryPercentage: .96,
-                     barPercentage: .96,
-                     barThickness: 'flex',
+                     categoryPercentage: 1,
+                     barPercentage: 1,
+                     barThickness: barheight,
                      //   barThickness: 20,
 					 stacked: true,
                      gridLines: {
-                         color: "#f7f7f7",
+                         color: "#ffffff",
                          display: true,
                          lineWidth: .5,
-                         //	zeroLineColor: "#5e7287",
+                         zeroLineColor: "#5e7287",
                          zeroLineWidth: 0,
                          //    borderDash: [2, 5],
                      },
@@ -376,12 +402,12 @@ var $backgroundColors=[
                      barThickness: 'flex',
 					 stacked: true,
 					 gridLines: {
-                         color: "#e2e2e2",
-                         //    zeroLineColor: "#5e7287",
+                         color: hex2rgba("#5e7287",50),
                          display: true,
-                         lineWidth: .5,
-                         borderDash: [3, 8],
-                         zeroLineWidth: 0,
+                         lineWidth: .2,
+                         borderDash: [5, 5],
+                         zeroLineColor: "#5e7287",
+                         zeroLineWidth: .25,
                      },
                      scaleLabel: {
                          display: true,

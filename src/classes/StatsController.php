@@ -275,7 +275,7 @@ class StatsController
             'requests'                  => $requests,
             'params'                    => $params,
             'modes'                     => static::$modeNames,
-            'rowCount'                  => count($total)*3*4,
+            'rowCount'                  => count($total),
             'what'                      => 'total',
             'current_view_class'        => 'total',
             'title'                     => 'Total of Durations',
