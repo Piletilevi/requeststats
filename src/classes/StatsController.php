@@ -34,8 +34,9 @@ class StatsController
 // choose stat view
     public function view_select(Request $request, Response $response, array $args)
     {
+        $what_view = array('main', 'total_durations', 'total_requests');
         $params = $request->getQueryParams();
-        if(!empty($params['what'])){
+        if(!empty($params['what']) &&  in_array($params['what'], $what_view)){
             $what = $params['what'];
             $this->$what($request, $response, $args);
         }
@@ -217,7 +218,7 @@ class StatsController
         ]);
     }
 
-    public function total(Request $request, Response $response, array $args)
+    public function total_durations(Request $request, Response $response, array $args)
     {
         /**@var $statsManager \app\StatsManager* */
         $statsManager = $this->container->get('stats_manager');
@@ -227,9 +228,9 @@ class StatsController
         $dateTimeHandler = $this->container->get('datetime_handler');
         $currentDateString = $dateTimeHandler->getCurrentDateString();
         $monthAgoDateString = $dateTimeHandler->getMonthAgoDateString();
-    //    var_dump($monthAgoDateString);
+        //    var_dump($monthAgoDateString);
         $defaultParams = [
-            'what'    => 'total',
+            'what'    => 'total_durations',
             'mode'    => 'hours',
             'date'    => $monthAgoDateString[0] . ' - ' . $monthAgoDateString[1],
             'request' => 0
@@ -270,15 +271,82 @@ class StatsController
 
 
         $total = array_merge_recursive($names,$namesSuccess);
-        return $view->render($response, 'total.twig', [
+        return $view->render($response, 'total_durations.twig', [
             'totalChart'                => $total,
             'requests'                  => $requests,
             'params'                    => $params,
             'modes'                     => static::$modeNames,
             'rowCount'                  => count($total),
-            'what'                      => 'total',
+            'what'                      => 'total_durations',
             'current_view_class'        => 'total',
             'title'                     => 'Total of Durations',
+            'is_show_class_req_select'  => 'hidden',
+            'is_active_class'  => 'active',
+        ]);
+    }
+
+    public function total_requests(Request $request, Response $response, array $args)
+    {
+        /**@var $statsManager \app\StatsManager* */
+        $statsManager = $this->container->get('stats_manager');
+        $view = $this->container->get('view');
+        $palette = $this->container->get('settings')->get('palette');
+        /**@var $dateTimeHandler \app\DateTimeHandler* */
+        $dateTimeHandler = $this->container->get('datetime_handler');
+        $currentDateString = $dateTimeHandler->getCurrentDateString();
+        $monthAgoDateString = $dateTimeHandler->getMonthAgoDateString();
+        //    var_dump($monthAgoDateString);
+        $defaultParams = [
+            'what'    => 'total_requests',
+            'mode'    => 'hours',
+            'date'    => $monthAgoDateString[0] . ' - ' . $monthAgoDateString[1],
+            'request' => 0
+        ];
+        $params = $request->getQueryParams() + $defaultParams;
+        $modeName = $params['mode'];
+        if (!in_array($modeName, static::$modeNames)) {
+            $modeName = $defaultParams['mode'];
+        }
+        $calcCriteria = array_search($modeName, static::$modeNames);
+        $parts = explode('-', $params['date']);
+        $parts = array_filter(array_map('trim', $parts));
+        if (!$parts) {
+            $startDateString = $endDateString = $currentDateString;
+        } else {
+            $startDateString = $endDateString = $parts[0];
+        }
+        if (count($parts) > 1) {
+            $endDateString = $parts[1];
+        }
+        $startDate = $dateTimeHandler->convertFromDateString($startDateString);
+        $endDate = $dateTimeHandler->convertFromDateString($endDateString);
+        if (!$startDate || !$endDate || $startDate > $endDate) {
+            user_error('Invalid date range provided!');
+        }
+        $startDate->setTime(0, 0, 0);
+        $endDate->setTime(23, 59, 59);
+
+        $calc = $this->container->get('stats_calc');
+        $calc->setStartStamp($startDate->getTimestamp());
+        $calc->setEndStamp($endDate->getTimestamp());
+        $calc->setRequestId($params['request']);
+
+        $names = $calc->totalDurationsByReqName($calcCriteria);
+        $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
+
+        $requests = $statsManager->queryRequestNames();
+
+
+        $total = array_merge_recursive($names,$namesSuccess);
+        return $view->render($response, 'total_requests.twig', [
+            'totalChart'                => $total,
+            'requests'                  => $requests,
+            'params'                    => $params,
+            'modes'                     => static::$modeNames,
+            'rowCount'                  => count($total),
+            'what'                      => 'total_requests',
+            'current_view_class'        => 'total',
+            'title'                     => 'Total of Requests',
             'is_show_class_req_select'  => 'hidden',
             'is_active_class'  => 'active',
         ]);

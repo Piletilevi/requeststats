@@ -190,6 +190,7 @@ requestName
         $qr = $query->get("Durations, requestName");
         return $qr;
     }
+
     public function requestNameByMaxDuration($criteria)
     {
         $result = $this->queryRequestNameByMaxDuration($criteria);
