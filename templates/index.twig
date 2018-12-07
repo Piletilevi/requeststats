@@ -52,6 +52,7 @@
 
     <div class="panel panel-default">
         <div class="panel-body">
+            <div class="pull-right"><button onclick="download()" class="btn btn-success">Save chart as image</button></div>
             <form class="form-inline" method="get">
                 <div class="form-group">
                     <label for="form-control-date" class="control-label">Date</label>
@@ -81,8 +82,9 @@
             </form>
         </div>
     </div>
-
-    {% block content %} {% endblock %}
+    <div id="chart-container">
+        {% block content %} {% endblock %}
+    </div>
 
 </div>
 
@@ -93,6 +95,7 @@
 <script src="bower_components/chart.js/dist/Chart.min.js"></script>
 <script src="bower_components/moment/min/moment.min.js"></script>
 <script src="bower_components/bootstrap-daterangepicker/daterangepicker.js"></script>
+<script src="html2canvas.min.js"></script>
 <script src="project.js"></script>
 {% block additional_js %} {% endblock %}
 </body>

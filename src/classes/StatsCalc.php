@@ -146,7 +146,7 @@ class StatsCalc
         return $qr;
     }
 
-    protected function queryTotalDurationsByReqName($criteria, $statExpression=false)
+    protected function queryTotalDurationsCountsByReqName($criteria, $statExpression=false)
     {
          if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
             throw new \InvalidArgumentException();
@@ -155,9 +155,20 @@ class StatsCalc
         $query = $this->db->table('total_stat')
             ->selectRaw("
 SUM(duration) AS Durations,
-requestName,
-SUM(statStatus) AS successStatuses,
-COUNT(requestName) AS requestCount
+CAST(SUM(
+      (
+          CASE WHEN(statStatus = 1) THEN duration ELSE 0
+              END
+          )
+        ) as INT) AS durationsSuccess,
+SUM(count) AS Counts,
+CAST(SUM(
+      (
+          CASE WHEN(statStatus = 1) THEN count ELSE 0
+              END
+          )
+        ) as INT) AS countsSuccess,
+requestName
 ")
             ->where('statDate', '>=', date('Y-m-d', $this->startStamp))
             ->where('statDate', '<=', date('Y-m-d', $this->endStamp))
@@ -165,11 +176,11 @@ COUNT(requestName) AS requestCount
             ->orderBy('requestName', 'ASC')
             //    ->limit(100)
         ;
-        $qr = $query->get("Durations, requestName, successStatuses, requestCount");
+        $qr = $query->get("Durations, durationsSuccess, Counts, countsSuccess, requestName");
         return $qr;
     }
 
-    protected function querySuccessTotalDurationsByReqName($criteria, $statExpression=false)
+/*    protected function querySuccessTotalDurationsByReqName($criteria, $statExpression=false)
     {
          if (!in_array($criteria, array_flip(static::$groupingFormulasTotal))) {
             throw new \InvalidArgumentException();
@@ -189,7 +200,7 @@ requestName
         ;
         $qr = $query->get("Durations, requestName");
         return $qr;
-    }
+    }*/
 
     public function requestNameByMaxDuration($criteria)
     {
@@ -208,33 +219,22 @@ requestName
         return $resultEnd;
     }
 
-    public function totalDurationsByReqName($criteria)
+    public function totalDurationsCountsByReqName($criteria)
     {
-        $result = $this->queryTotalDurationsByReqName($criteria);
+        $result = $this->queryTotalDurationsCountsByReqName($criteria);
         $resultEnd = [];
         foreach ($result as $key => $value) {
             $key = rtrim(ltrim($value['requestName'],'xml_'),'.p');
             $resultEnd[$key]=  array(
-                'Success'=>$value['successStatuses'],
-                'Requests'=>$value['requestCount'],
-                'Durations'=>$value['Durations']
+                'Durations'=>$value['Durations'],
+                'durationsSuccess'=>$value['durationsSuccess'],
+                'Counts'=>$value['Counts'],
+                'countsSuccess'=>$value['countsSuccess'],
             ) ;
          }
         return $resultEnd;
     }
 
-    public function totalSuccessDurationsByReqName($criteria)
-    {
-        $result = $this->querySuccessTotalDurationsByReqName($criteria);
-        $resultEnd = [];
-        foreach ($result as $key => $value) {
-            $key = rtrim(ltrim($value['requestName'],'xml_'),'.p');
-            $resultEnd[$key]=  array(
-                'DurationsSuccess'=>$value['Durations']
-            ) ;
-         }
-        return $resultEnd;
-    }
 }
 
 /*
@@ -244,15 +244,63 @@ requestName
  * VIEW `total_stat`
  *
  *
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `total_stat` AS
-select `stat`.`id` AS `statId`,
-`stat`.`time` AS `statDateTime`,
-cast(`stat`.`time` as time) AS `statTime`,
-cast(`stat`.`time` as date) AS `statDate`,
-dayofweek(`stat`.`time`) AS `statWeekDay`,
-`stat`.`status` AS `statStatus`,
-`stat`.`duration` AS `duration`,
-(select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName`
-from `stat` order by `stat`.`id`
+CREATE ALGORITHM = UNDEFINED
+  DEFINER =`root`@`localhost`
+  SQL SECURITY DEFINER VIEW `total_stat` AS
+  select `stat`.`id`                                                                           AS `statId`,
+         `stat`.`time`                                                                         AS `statDateTime`,
+         cast(`stat`.`time` as time)                                                           AS `statTime`,
+         cast(`stat`.`time` as date)                                                           AS `statDate`,
+         dayofweek(`stat`.`time`)                                                              AS `statWeekDay`,
+         `stat`.`status`                                                                       AS `statStatus`,
+         `stat`.`duration`                                                                     AS `duration`,
+         `stat`.`count`                                                                        AS `count`,
+         (select `request`.`name` from `request` where (`request`.`id` = `stat`.`request_id`)) AS `requestName`
+  from `stat`
+  order by `stat`.`id`
+
+----------------------------------------------------------------------------------------------------------------------
+ * VIEW `durs_reqs_by_day_hour_reqname`
+ *
+ *
+
+CREATE ALGORITHM = UNDEFINED
+  DEFINER =`root`@`localhost`
+  SQL SECURITY DEFINER VIEW `durs_reqs_by_day_hour_reqname` AS
+SELECT `total_stat`.`requestName`                              AS `requestName`,
+         CAST(SUM(`total_stat`.`duration`) as INT)               AS `Durations`,
+         CAST(SUM(
+             (
+                    CASE
+                      WHEN (`total_stat`.`statStatus` = 1) THEN `total_stat`.`duration`
+                      ELSE 0
+                        END
+                    )
+                  ) as INT)                                      AS `durationsSuccess`,
+         CAST(SUM(`total_stat`.`count`) as INT)                  AS `Counts`,
+         CAST(SUM(
+             (
+                    CASE
+                      WHEN (`total_stat`.`statStatus` = 1) THEN `total_stat`.`count`
+                      ELSE 0
+                        END
+                    )
+                  ) as INT)                                      AS `countsSuccess`,
+         CAST(
+             DATE_FORMAT(
+                 `total_stat`.`statDateTime`,
+                 '%Y-%m-%d %H'
+             ) AS DATETIME
+             )                                                   AS `dayHour`,
+         `total_stat`.`statDate`                                 AS `Day`,
+         cast(TIME_FORMAT(`total_stat`.`statTime`, '%H') as INT) AS `Hour`,
+         `total_stat`.`statWeekDay`                              AS `weekDay`
+  FROM `piletilevi_requests`.`total_stat`
+  GROUP BY dayHour,
+           `total_stat`.`requestName`
+  ORDER BY dayHour DESC,
+           `total_stat`.`requestName` ASC;
+
 
 */
+

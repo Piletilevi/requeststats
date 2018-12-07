@@ -264,19 +264,19 @@ class StatsController
         $calc->setEndStamp($endDate->getTimestamp());
         $calc->setRequestId($params['request']);
 
-        $names = $calc->totalDurationsByReqName($calcCriteria);
-        $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
+        $names = $calc->totalDurationsCountsByReqName($calcCriteria);
+    //    $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
 
         $requests = $statsManager->queryRequestNames();
 
 
-        $total = array_merge_recursive($names,$namesSuccess);
+    //    $total = array_merge_recursive($names,$namesSuccess);
         return $view->render($response, 'total_durations.twig', [
-            'totalChart'                => $total,
+            'totalChart'                => $names,
             'requests'                  => $requests,
             'params'                    => $params,
             'modes'                     => static::$modeNames,
-            'rowCount'                  => count($total),
+            'rowCount'                  => count($names),
             'what'                      => 'total_durations',
             'current_view_class'        => 'total',
             'title'                     => 'Total of Durations',
@@ -331,19 +331,19 @@ class StatsController
         $calc->setEndStamp($endDate->getTimestamp());
         $calc->setRequestId($params['request']);
 
-        $names = $calc->totalDurationsByReqName($calcCriteria);
-        $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
+        $names = $calc->totalDurationsCountsByReqName($calcCriteria);
+     //   $namesSuccess = $calc->totalSuccessDurationsByReqName($calcCriteria);
 
         $requests = $statsManager->queryRequestNames();
 
 
-        $total = array_merge_recursive($names,$namesSuccess);
+     //   $total = array_merge_recursive($names,$namesSuccess);
         return $view->render($response, 'total_requests.twig', [
-            'totalChart'                => $total,
+            'totalChart'                => $names,
             'requests'                  => $requests,
             'params'                    => $params,
             'modes'                     => static::$modeNames,
-            'rowCount'                  => count($total),
+            'rowCount'                  => count($names),
             'what'                      => 'total_requests',
             'current_view_class'        => 'total',
             'title'                     => 'Total of Requests',
