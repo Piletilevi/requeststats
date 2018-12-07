@@ -437,14 +437,15 @@ var formatter_dec_0 = new Intl.NumberFormat(currentLang, {
 	//	maximumSignificantDigits: 20, // if in use, FractionDigits will be ignored
 });
 
-function download() {
-    if (!isChartRendered) return; // return if chart not rendered
-    html2canvas(document.getElementById('chart-container'), {
+$('#download-chart').click(function() {
+    html2canvas($('#chart-container'), {
         onrendered: function(canvas) {
-            var link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'pl-stat.png';
-            link.click();
+            var a = $('#download').get(0);
+            var imageTitle1 = $('input[name="what"]').val();
+            var imageTitle2 = $('input[name="date"]').val().replace(/\s+/g,'');
+            a.href = canvas.toDataURL("image/png")
+            a.download = 'pl-stat-'+imageTitle1+'_'+imageTitle2+'.png';
+            a.click();
         }
-    })
-}
+    });
+});
