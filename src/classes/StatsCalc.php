@@ -251,7 +251,7 @@ CREATE ALGORITHM = UNDEFINED
          `stat`.`time`                                                                         AS `statDateTime`,
          cast(`stat`.`time` as time)                                                           AS `statTime`,
          cast(`stat`.`time` as date)                                                           AS `statDate`,
-         dayofweek(`stat`.`time`)                                                              AS `statWeekDay`,
+         cast(DATE_FORMAT(`stat`.`time`, '%w')  as INT)                                        AS `statWeekDay`,
          `stat`.`status`                                                                       AS `statStatus`,
          `stat`.`duration`                                                                     AS `duration`,
          `stat`.`count`                                                                        AS `count`,
