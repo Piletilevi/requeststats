@@ -155,13 +155,8 @@ var $backgroundColors=[
 			 }
 		 });
 	 });
-     Object.assign(
-         Chart.defaults.global, {
-             maintainAspectRatio: false,
-         //    responsive: true
-         }
-     );
 
+     Chart.defaults.global.maintainAspectRatio = false;
 	 Chart.defaults.global.defaultFontFamily = 'Encode Sans Condensed';
 	 Chart.defaults.global.defaultFontSize = 12;
 
@@ -418,7 +413,7 @@ var $labelSuffix;
 
 }
 
-function hex2rgba(hex,opacity=100) {
+function hex2rgba(hex,opacity) {
     hex=hex.slice(1);
     return 'rgba(' +
         parseInt(hex.slice(0,2),16) + ',' +
