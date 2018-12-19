@@ -1,0 +1,18 @@
+{% extends "index.twig" %}
+
+{% block content %}
+<div class="panel panel-default">
+        <div class="panel-body">
+            <div class="chartBar">
+                <canvas id="popChartTotal" height="{{ rowCount *34+150}}" width="100%" data-names="{{ totalChart | json_encode }}"></canvas>
+            </div>
+        </div>
+</div>
+{% endblock content %}
+
+{% block what_name %} <input type="hidden" name="what" value="total_requests"> {% endblock %}
+
+{% block additional_js %}
+<script>popChartTotalDurationsRequests('count');</script>
+{% endblock additional_js %}
+

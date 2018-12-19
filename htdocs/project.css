@@ -1,7 +1,25 @@
+body{
+	font-family: 'Encode Sans Condensed', sans-serif;
+	font-size: 18px;
+	font-weight: 400;
+}
 .navbar {
 	margin-bottom: 20px;
 }
+ul.nav.navbar-nav li  a {
+	-webkit-transition: all .3s ease;
+	transition: all .3s ease;
+}
+ul.nav.navbar-nav li:hover a {
+	color: #424d58;
+	background: #e3e6ec;
+}
 
+@media (min-width: 768px){
+	#navbar.navbar-right .navbar-nav {
+		float: right;
+	}
+}
 .form-inline .form-group > .form-control,
 .form-inline .form-group > .btn {
 	min-width: 6em;
@@ -9,4 +27,34 @@
 
 .form-inline label {
     margin-left: 0.5em;
+}
+.chartBar canvas{
+	/*	width: 100%;
+padding-right: 10em;*/
+}
+
+@media (min-width: 1300px){
+	.container {
+		width: 1270px;
+	}
+}
+@media (min-width: 1400px){
+	.container {
+		width: 1370px;
+	}
+}
+@media (min-width: 1500px){
+	.container {
+		width: 1470px;
+	}
+}
+@media (min-width: 1600px){
+	.container {
+		width: 1570px;
+	}
+}
+@media (min-width: 1700px){
+	.container {
+		width: 1670px;
+	}
 }
