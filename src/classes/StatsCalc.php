@@ -160,14 +160,14 @@ CAST(SUM(
           CASE WHEN(statStatus = 1) THEN duration ELSE 0
               END
           )
-        ) as INT) AS durationsSuccess,
+        ) as signed) AS durationsSuccess,
 SUM(count) AS Counts,
 CAST(SUM(
       (
           CASE WHEN(statStatus = 1) THEN count ELSE 0
               END
           )
-        ) as INT) AS countsSuccess,
+        ) as signed) AS countsSuccess,
 requestName
 ")
             ->where('statDate', '>=', date('Y-m-d', $this->startStamp))
@@ -251,7 +251,7 @@ CREATE ALGORITHM = UNDEFINED
          `stat`.`time`                                                                         AS `statDateTime`,
          cast(`stat`.`time` as time)                                                           AS `statTime`,
          cast(`stat`.`time` as date)                                                           AS `statDate`,
-         cast(DATE_FORMAT(`stat`.`time`, '%w')  as INT)                                        AS `statWeekDay`,
+         cast(DATE_FORMAT(`stat`.`time`, '%w')  as signed)                                     AS `statWeekDay`,
          `stat`.`status`                                                                       AS `statStatus`,
          `stat`.`duration`                                                                     AS `duration`,
          `stat`.`count`                                                                        AS `count`,
@@ -268,7 +268,7 @@ CREATE ALGORITHM = UNDEFINED
   DEFINER =`root`@`localhost`
   SQL SECURITY DEFINER VIEW `durs_reqs_by_day_hour_reqname` AS
 SELECT `total_stat`.`requestName`                              AS `requestName`,
-         CAST(SUM(`total_stat`.`duration`) as INT)               AS `Durations`,
+         CAST(SUM(`total_stat`.`duration`) as signed)               AS `Durations`,
          CAST(SUM(
              (
                     CASE
@@ -277,7 +277,7 @@ SELECT `total_stat`.`requestName`                              AS `requestName`,
                         END
                     )
                   ) as INT)                                      AS `durationsSuccess`,
-         CAST(SUM(`total_stat`.`count`) as INT)                  AS `Counts`,
+         CAST(SUM(`total_stat`.`count`) as signed)                  AS `Counts`,
          CAST(SUM(
              (
                     CASE
