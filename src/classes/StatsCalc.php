@@ -276,7 +276,7 @@ SELECT `total_stat`.`requestName`                              AS `requestName`,
                       ELSE 0
                         END
                     )
-                  ) as INT)                                      AS `durationsSuccess`,
+                  ) as signed)                                      AS `durationsSuccess`,
          CAST(SUM(`total_stat`.`count`) as signed)                  AS `Counts`,
          CAST(SUM(
              (
@@ -285,7 +285,7 @@ SELECT `total_stat`.`requestName`                              AS `requestName`,
                       ELSE 0
                         END
                     )
-                  ) as INT)                                      AS `countsSuccess`,
+                  ) as signed)                                      AS `countsSuccess`,
          CAST(
              DATE_FORMAT(
                  `total_stat`.`statDateTime`,
@@ -293,9 +293,9 @@ SELECT `total_stat`.`requestName`                              AS `requestName`,
              ) AS DATETIME
              )                                                   AS `dayHour`,
          `total_stat`.`statDate`                                 AS `Day`,
-         cast(TIME_FORMAT(`total_stat`.`statTime`, '%H') as INT) AS `Hour`,
+         cast(TIME_FORMAT(`total_stat`.`statTime`, '%H') as signed) AS `Hour`,
          `total_stat`.`statWeekDay`                              AS `weekDay`
-  FROM `piletilevi_requests`.`total_stat`
+  FROM `requeststats`.`total_stat`
   GROUP BY dayHour,
            `total_stat`.`requestName`
   ORDER BY dayHour DESC,
