@@ -125,14 +125,14 @@ var $backgroundColors=[
 		 $countsFail[i] = $names[key].Counts - $names[key].countsSuccess;
 		 //formatter_dec_0.format(dataString);
          if (bar==='duration'){
-             $tooltips[i]['total'] = 'Total Requests:  ' + formatter_dec_0.format($names[key].Counts);
-             $tooltips[i]['success'] = 'Success Requests:  ' + formatter_dec_0.format($names[key].countsSuccess);
-             $tooltips[i]['fail'] = 'Failed Requests:  ' + formatter_dec_0.format((parseInt($names[key].Counts) - parseInt($names[key].countsSuccess)));
+             $tooltips[i]['total'] = 'Total Count of Requests:  ' + formatter_dec_0.format($names[key].Counts);
+             $tooltips[i]['success'] = 'Count of Success Requests:  ' + formatter_dec_0.format($names[key].countsSuccess);
+             $tooltips[i]['fail'] = 'Count of Failed Requests:  ' + formatter_dec_0.format((parseInt($names[key].Counts) - parseInt($names[key].countsSuccess)));
          }
          else{
-             $tooltips[i]['total'] = 'Total Requests:  ' + formatter_dec_0.format($names[key].Durations);
-             $tooltips[i]['success'] = 'Success Requests:  ' + formatter_dec_0.format($names[key].durationsSuccess);
-             $tooltips[i]['fail'] = 'Failed Requests:  ' + formatter_dec_0.format((parseInt($names[key].Durations) - parseInt($names[key].durationsSuccess)));
+             $tooltips[i]['total'] = 'Duration of Total Requests:  ' + formatter_dec_0.format($names[key].Durations);
+             $tooltips[i]['success'] = 'Duration of Success Requests:  ' + formatter_dec_0.format($names[key].durationsSuccess);
+             $tooltips[i]['fail'] = 'Duration of Failed Requests:  ' + formatter_dec_0.format((parseInt($names[key].Durations) - parseInt($names[key].durationsSuccess)));
          }
 		 rows = i + 1;
 	 });
